@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jxd.travel.dao.ITravelInfoDao">
+    <insert id="insertTravelInfo">
+        insert into travel_info
+        (travel_id, empno, start_time, arrival_time, travel_days,
+        reimbursement_total, travel_desc, money_uppercase, reimbursement_date)
+        value
+        (#{travelInfo.travelId}, #{travelInfo.empno},
+        #{travelInfo.startTime}, #{travelInfo.arrivalTime},
+        #{travelInfo.travelDays},
+        #{travelInfo.reimbursementTotal}, #{travelInfo.travelDesc},
+        #{travelInfo.moneyUppercase},
+        <choose>
+            <when test="travelInfo.reimbursementDate != ''">
+                #{travelInfo.reimbursementDate}
+            </when>
+            <otherwise>
+                null
+            </otherwise>
+        </choose>
+        )
+    </insert>
+
+    <update id="updateTravelDesc">
+        update travel_info
+        set travel_desc = #{travelInfo.travelDesc},
+            travel_days = #{travelInfo.travelDays},
+            reimbursement_total = #{travelInfo.reimbursementTotal},
+            money_uppercase = #{travelInfo.moneyUppercase}
+        where travel_id = #{travelInfo.travelId}
+    </update>
+
+    <update id="updateStatus">
+        update travel_info
+        set status = #{status}
+        where travel_id in
+        <foreach collection="travelIds" item="travelId" open="("
+                 separator="," close=")">
+            #{travelId}
+        </foreach>
+    </update>
+
+    <update id="updateStatusAndReason">
+        update travel_info
+        set status           = #{status},
+            rejection_reason = #{rejectionReason}
+        where travel_id = #{travelId}
+    </update>
+
+    <update id="updateSubmitDate">
+        update travel_info
+        set status = 2,reimbursement_date =
+            #{travelInfo.reimbursementDate},travel_days =
+            #{travelInfo.travelDays},reimbursement_total =
+            #{travelInfo.reimbursementTotal},money_uppercase =
+            #{travelInfo.moneyUppercase},travel_desc = #{travelInfo.travelDesc}
+        where travel_id = #{travelInfo.travelId}
+    </update>
+
+    <delete id="deleteTravelInfos">
+        delete from travel_info
+        where travel_id in
+        <foreach collection="travelIds" item="travelId" open="("
+                 separator="," close=")">
+            #{travelId}
+        </foreach>
+    </delete>
+
+    <select id="selectTravelInfos" resultType="travelInfo">
+        select travel_id,
+        travel_desc,
+        reimbursement_total,
+        reimbursement_date,
+        status
+        from travel_info
+        where empno = #{empno}
+        <if test="reimbursementDate != ''">
+            and datediff(reimbursement_date,#{reimbursementDate}) = 0
+        </if>
+        order by travel_id
+    </select>
+
+    <select id="selectStatus" resultType="double">
+        select status
+        from travel_info
+        where empno = #{empno}
+    </select>
+
+    <select id="selectMaxTravelId" resultType="integer">
+        select max(travel_id)
+        from travel_info
+    </select>
+
+    <select id="selectTravelInfo" resultType="travelInfo">
+        select start_time,
+               arrival_time,
+               travel_days,
+               reimbursement_total,
+               money_uppercase,
+               travel_desc,
+               reimbursement_date,
+               status,
+               rejection_reason
+        from travel_info
+        where travel_id = #{travelId}
+    </select>
+
+    <select id="selectTravelInfosByStatus"
+            resultType="travelInfoResult">
+        select travel_id,
+               ename,
+               travel_desc,
+               reimbursement_total,
+               reimbursement_date,
+               start_time,
+               arrival_time,
+               travel_days,
+               money_uppercase,
+               rejection_reason
+        from travel_info t,
+             emp e
+        where status = #{status}
+          and t.empno = e.empno
+    </select>
+</mapper>

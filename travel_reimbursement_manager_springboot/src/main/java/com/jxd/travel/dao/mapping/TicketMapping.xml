@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jxd.travel.dao.ITicketDao">
+    <insert id="addTicket">
+        insert into ticket (empno, start_point, arrival_point, start_time,
+                            arrival_time, travel_desc, trans_id,
+                            price, travel_type_id, ticket_picture_url)
+            value
+            (#{empno}, #{startPoint}, #{arrivalPoint}, #{startTime},
+             #{arrivalTime},
+             #{travelDesc}, #{transId}, #{price}, #{travelTypeId},
+             #{ticketPictureUrl})
+    </insert>
+
+    <update id="updateTravelId">
+        update ticket
+        set travel_id   = #{ticket.travelId},
+            travel_desc = #{ticket.travelDesc}
+        where tid = #{ticket.tid}
+    </update>
+
+    <update id="disassociateTickets">
+        update ticket set travel_id = null,travel_desc = null
+        where travel_id in
+        <foreach collection="travelIds" close=")" separator="," open="("
+                 item="travelId">
+            #{travelId}
+        </foreach>
+    </update>
+
+    <update id="updateTravelDesc">
+        update ticket
+        set travel_desc = #{ticket.travelDesc}
+        where tid = #{ticket.tid}
+    </update>
+
+    <delete id="delTickets">
+        delete from ticket where tid in
+        <foreach collection="tids" item="tid" separator="," open="("
+                 close=")">
+            #{tid}
+        </foreach>
+    </delete>
+
+    <select id="selectTicketsByTime" resultType="ticketResult">
+        select tid,
+        start_point,
+        arrival_point,
+        start_time,
+        arrival_time,
+        travel_desc,
+        transportation,
+        travel_id,
+        price,
+        travel_type_name travel_type
+        from ticket t,
+        travel_type tt,
+        transport ts
+        where
+        t.travel_type_id = tt.travel_type_id and
+        t.trans_id = ts.trans_id and
+        t.empno = #{empno}
+        <if test="startTime != '' and arrivalTime != ''">
+            and datediff(start_time,#{startTime}) = 0 and
+            datediff(arrival_Time,#{arrivalTime}) = 0
+        </if>
+        order by start_time
+    </select>
+
+    <select id="selectAllTickets" resultType="ticketResult">
+        select tid,
+               start_point,
+               arrival_point,
+               start_time,
+               arrival_time,
+               travel_desc,
+               transportation,
+               travel_id,
+               price,
+               travel_type_name travel_type
+        from ticket t,
+             travel_type tt,
+             transport ts
+        where t.travel_type_id = tt.travel_type_id
+          and t.trans_id = ts.trans_id
+          and t.empno = #{empno}
+          and t.travel_id is null
+        order by start_time
+    </select>
+
+    <select id="selectTicketsByTravelId" resultType="ticketResult">
+        select travel_type_name travel_type,
+               tid,
+               start_point,
+               arrival_point,
+               start_time,
+               arrival_time,
+               transportation,
+               price
+        from ticket t,
+             travel_type tt,
+             transport ts
+        where t.travel_id = #{travelId}
+          and t.travel_type_id = tt.travel_type_id
+          and t.trans_id = ts.trans_id
+    </select>
+
+    <select id="selectTidsWithoutAssociation" resultType="integer">
+        select tid
+        from ticket
+        where travel_id is not null
+    </select>
+
+    <select id="selectTidsByEmpnos" resultType="integer">
+        select tid from ticket
+        where empno in
+        <foreach collection="empnos" item="empno" close=")" separator=","
+                 open="(">
+            #{empno}
+        </foreach>
+    </select>
+
+    <select id="selectTravelIdsByTids" resultType="integer">
+        select travel_id
+        from ticket
+        where travel_id is not null
+        and tid in
+        <foreach collection="tids" item="tid" open="(" separator=","
+                 close=")">
+            #{tid}
+        </foreach>
+    </select>
+
+    <select id="selectTicketsByTransId" resultType="ticket">
+        select trans_id,travel_id,tid
+        from ticket where trans_id in
+        <foreach collection="transIds" item="transId" open="("
+                 separator="," close=")">
+                #{transId}
+        </foreach>
+    </select>
+</mapper>

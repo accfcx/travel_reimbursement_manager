@@ -1,0 +1,29 @@
+#后台端口号
+server:
+  port: 8086
+
+#Spring相关配置
+spring:
+  #配置数据源
+  datasource:
+    url: jdbc:mysql://localhost:3306/travel?autoReconnect=true&useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+  servlet:
+    multipart: #设置上传文件大小
+      enabled: true
+      max-file-size: 2MB #设置单个文件的大小
+      max-request-size: 2MB #设置单次请求的文件的总大小
+
+#MyBatis-Plus配置
+mybatis-plus:
+  mapper-locations: classpath:com/jxd/travel/dao/mapping/*.xml
+  type-aliases-package: com.jxd.travel.*
+
+#上传文件配置
+file:
+  #映射路径
+  path: upload/**
+  #真实路径中文件夹名
+  address: /upload/
