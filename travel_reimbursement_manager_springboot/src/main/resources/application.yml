@@ -18,8 +18,8 @@ spring:
 
 #MyBatis-Plus配置
 mybatis-plus:
-  mapper-locations: classpath:com/jxd/travel/dao/mapping/*.xml
-  type-aliases-package: com.jxd.travel.*
+  mapper-locations: classpath:com/test/recipe/dao/mapping/*.xml
+  type-aliases-package: com.test.recipe.*
 
 #上传文件配置
 file:

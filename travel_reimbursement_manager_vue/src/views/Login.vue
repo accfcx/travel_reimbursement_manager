@@ -64,31 +64,35 @@ export default {
                 if (!valid) {
                     return // 不通过校验，结束方法
                 }
-                this.$http.post("/login", this.loginForm).then((res) => {
-                    if (res.data.msg == "error") {
-                        this.$message.error('员工id或密码错误')
-                        this.$router.push("/")
-                    } else if (res.data.msg == "manager") {
-                        // 跳转到管理员页面
-                        sessionStorage.setItem("uid", this.loginForm.uid)
-                        sessionStorage.setItem("loggedName", res.data.data)
-                        this.$router.push("/manager/empManage")
-                    } else if (res.data.msg == "employee") {
-                        // 跳转到员工页面
-                        sessionStorage.setItem("uid", this.loginForm.uid)
-                        sessionStorage.setItem("loggedName", res.data.data)
-                        this.$router.push("/employee/ticketMessage")
-                    } else if (res.data.msg == "deptHead") {
-                        // 跳转到部门经理页面
-                        sessionStorage.setItem("uid", this.loginForm.uid)
-                        sessionStorage.setItem("loggedName", res.data.data)
-                        this.$router.push("/deptHead/deptHeadApproval")
-                    } else if (res.data.msg == "financial") {
-                        sessionStorage.setItem("uid", this.loginForm.uid)
-                        sessionStorage.setItem("loggedName", res.data.data)
-                        this.$router.push("/financial/financialApproval")
-                    }
-                })
+                // this.$http.post("/login", this.loginForm).then((res) => {
+                //     if (res.data.msg == "error") {
+                //         this.$message.error('员工id或密码错误')
+                //         this.$router.push("/")
+                //     } else if (res.data.msg == "manager") {
+                //         // 跳转到管理员页面
+                //         sessionStorage.setItem("uid", this.loginForm.uid)
+                //         sessionStorage.setItem("loggedName", res.data.data)
+                //         this.$router.push("/manager/empManage")
+                //     } else if (res.data.msg == "employee") {
+                //         // 跳转到员工页面
+                //         sessionStorage.setItem("uid", this.loginForm.uid)
+                //         sessionStorage.setItem("loggedName", res.data.data)
+                //         this.$router.push("/employee/ticketMessage")
+                //     } else if (res.data.msg == "deptHead") {
+                //         // 跳转到部门经理页面
+                //         sessionStorage.setItem("uid", this.loginForm.uid)
+                //         sessionStorage.setItem("loggedName", res.data.data)
+                //         this.$router.push("/deptHead/deptHeadApproval")
+                //     } else if (res.data.msg == "financial") {
+                //         sessionStorage.setItem("uid", this.loginForm.uid)
+                //         sessionStorage.setItem("loggedName", res.data.data)
+                //         this.$router.push("/financial/financialApproval")
+                //     }
+                // })
+                      sessionStorage.setItem("uid", 3)
+                      sessionStorage.setItem("username", "wanger")
+                      sessionStorage.setItem("loggedName", '张二')
+                      this.$router.push("/home/index")
             })
         }
     }

@@ -1,17 +1,19 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Login from '../views/Login';
-import Emp from '../views/Emp';
-import Manager from '../views/Manager';
-import DeptHead from '../views/DeptHead';
-import EmpManage from '../views/EmpManage';
-import TransportManage from '../views/TransportManage';
-import TicketMessage from '../views/TicketMessage';
-import Reimbursement from '../views/Reimbursement';
-import Financial from '../views/Financial';
-import DeptHeadApproval from '../views/DeptHeadApproval';
-import FinancialApproval from "../views/FinancialApproval";
 import BlankPage from "../views/BlankPage";
+import HomePage from "../views/HomePage.vue";
+import HomeIndex from "../views/home/HomeIndex.vue";
+import HomeApproval from "../views/home/HomeApproval.vue";
+import HomeRecipe from "../views/home/HomeRecipe.vue";
+import HomeSetting from "../views/home/HomeSetting.vue";
+import HomeAnalyze from "../views/home/HomeAnalyze.vue";
+import HomeProcess from "../views/home/HomeProcess.vue";
+
+import RecipeSQD from "../views/recipe/RecipeSQD.vue";
+import RecipeBXD from "../views/recipe/RecipeBXD.vue";
+import WorkOverTime from "../views/recipe/WorkOvertime.vue";
+import ReimbursementV2 from "../views/recipe/Reimbursement.vue";
 
 Vue.use(VueRouter)
 
@@ -22,65 +24,70 @@ const routes = [
         component: Login
     },
     {
-        path: '/employee',
-        name: 'Emp',
-        redirect: '/ticketMessage',
-        component: Emp,
+        path: '/panel',
+        component: () =>
+            import ('../views/process/panel')
+    },
+    {
+        path: '/instance',
+        component: () =>
+            import ('../views/process/instance')
+    },
+    {
+        path: '/recipeSQD',
+        name: 'RecipeSQD',
+        component: RecipeSQD
+    },
+    {
+        path: '/recipeBXD',
+        name: 'RecipeBXD',
+        component: RecipeBXD
+    },
+    {
+        path: '/workOverTime',
+        name: 'WorkOverTime',
+        component: WorkOverTime
+    },
+    {
+        path: '/reimbursement',
+        name: 'Reimbursement',
+        component: ReimbursementV2
+    },
+    {
+        path: '/home',
+        name: 'HomePage',
+        component: HomePage,
+        // redirect: '/index',
         children: [
             {
-                path: 'ticketMessage',
-                name: 'TicketMessage',
-                component: TicketMessage
+                path: 'index',
+                name: 'HomeIndex',
+                component: HomeIndex
             },
             {
-                path: 'reimbursement',
-                name: 'Reimbursement',
-                component: Reimbursement
-            }
-        ],
-    },
-    {
-        path: '/manager',
-        name: 'Manager',
-        component: Manager,
-        redirect: '/empManage',
-        children: [
-            {
-                path: 'empManage',
-                name: 'EmpManage',
-                component: EmpManage
+                path: 'approval',
+                name: 'HomeApproval',
+                component: HomeApproval
             },
             {
-                path: 'transportManage',
-                name: 'TransportManage',
-                component: TransportManage
-            }
-        ]
-
-    },
-    {
-        path: '/deptHead',
-        name: 'DeptHead',
-        redirect: '/deptApproval',
-        component: DeptHead,
-        children: [
+                path: 'recipe',
+                name: 'HomeRecipe',
+                component: HomeRecipe
+            },
             {
-                path: 'deptHeadApproval',
-                name: 'DeptHeadApproval',
-                component: DeptHeadApproval
-            }
-        ]
-    },
-    {
-        path: '/financial',
-        name: 'Financial',
-        redirect: '/financialApproval',
-        component: Financial,
-        children: [
+                path: 'setting',
+                name: 'HomeSetting',
+                component: HomeSetting
+            },
             {
-                path: 'financialApproval',
-                name: 'FinancialApproval',
-                component: FinancialApproval
+                path: 'analyze',
+                name: 'HomeAnalyze',
+                component: HomeAnalyze
+            },
+            {
+                path: 'process',
+                name: 'HomeProcess',
+                component: HomeProcess
             }
         ]
     },
@@ -106,7 +113,7 @@ router.beforeEach((to, from, next) => {
     } else if (uid == null) {
         // 未登录状态下访问登录后的页面，需要登录后访问
         next("/")
-    } else if (path.includes("/employee")  && uid.toString().charAt(0) == "3") {
+    } else if (path.includes("/employee") && uid.toString().charAt(0) == "3") {
         // 访问员工界面，且当前登录的是员工，直接放行
         next();
     } else if (path.includes("/manager") && uid.toString().charAt(0) == "1") {
@@ -119,7 +126,7 @@ router.beforeEach((to, from, next) => {
         // 访问部门经理界面，且当前登录的是部门经理，直接放行
         next();
     } else {
-        next("/")
+        next()
     }
 })
 

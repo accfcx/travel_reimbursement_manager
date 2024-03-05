@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.recipe.mapper.ISubsidyDao">
+
+    <insert id="insertSubsidyInfo">
+        insert into subsidy_info (work_point, start_time, end_time, travel_days,
+                                  subsidy, travel_id)
+            value
+            (#{subsidyInfo.workPoint}, #{subsidyInfo.startTime}, #{subsidyInfo.endTime}, #{subsidyInfo.travelDays},
+             #{subsidyInfo.subsidy},
+             #{subsidyInfo.travelId})
+    </insert>
+
+    <delete id="deleteSubsidyInfos">
+        delete from subsidy_info
+        where travel_id in
+        <foreach collection="travelIds" item="travelId" open="("
+                 separator="," close=")">
+            #{travelId}
+        </foreach>
+    </delete>
+
+    <select id="selectSubsidyInfosByTravelId"
+            resultType="subsidyInfo">
+        select work_point,start_time,end_time,travel_days,subsidy from subsidy_info
+        where travel_id = #{travelId}
+    </select>
+</mapper>
