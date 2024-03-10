@@ -48,11 +48,11 @@ public class ProcessController {
     @PostMapping("/saveModelMeta")
     public void saveModelMeta(@RequestBody BpmRequest bpmRequest) {
         ProcessDef pmsModel = new ProcessDef();
-        pmsModel.setModelKey(bpmRequest.getModelKey());
-        pmsModel.setModelName(bpmRequest.getModelName());
-        pmsModel.setUserName(bpmRequest.getUser());
-        pmsModel.setId(bpmRequest.getId());
-        pmsModel.setModelXml(bpmRequest.getXmlStr());
+//        pmsModel.setModelKey(bpmRequest.getModelKey());
+//        pmsModel.setModelName(bpmRequest.getModelName());
+//        pmsModel.setUserName(bpmRequest.getUser());
+//        pmsModel.setId(bpmRequest.getId());
+//        pmsModel.setModelXml(bpmRequest.getXmlStr());
         pmsModel.setStatus(bpmRequest.getStatus());
         if (pmsModel.getId() == 0) {
             pmsModel.setCreateTime(new Date());
