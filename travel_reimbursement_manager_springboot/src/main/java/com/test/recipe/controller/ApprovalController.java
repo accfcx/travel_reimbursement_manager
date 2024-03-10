@@ -1,6 +1,7 @@
 package com.test.recipe.controller;
 
 import com.test.recipe.mapper.PersonMapper;
+import com.test.recipe.mapper.RecipeMapper;
 import com.test.recipe.model.Person;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,10 +41,10 @@ public class ApprovalController {
     RuntimeService runtimeService;
 
     @Autowired
-    RecipeApplyMapper applyMapper;
+    RecipeMapper applyMapper;
 
-    @Autowired
-    RecipeReimbursementMapper reimbursementMapper;
+//    @Autowired
+//    RecipeReimbursementMapper reimbursementMapper;
 
 
     // 获取待本人审批的单据列表
@@ -80,18 +81,18 @@ public class ApprovalController {
 
                     Long id = Long.parseLong(recipeId);
                     Long feeTotal = null;
-                    String remark;
-                    Long uid;
-                    if (type.contains("Apply")) {
-                        RecipeApply recipeApply = applyMapper.findById(Long.parseLong(recipeId));
-                        remark = recipeApply.getRemark();
-                        uid = recipeApply.getUid();
-                    } else {
-                        RecipeReimbursement recipeReimbursement = reimbursementMapper.findById(Long.parseLong(recipeId));
-                        feeTotal = recipeReimbursement.getFeeTotal();
-                        remark = recipeReimbursement.getRemark();
-                        uid = recipeReimbursement.getUid();
-                    }
+                    String remark = null;
+                    Long uid = 0l;
+//                    if (type.contains("Apply")) {
+//                        RecipeApply recipeApply = applyMapper.findById(Long.parseLong(recipeId));
+//                        remark = recipeApply.getRemark();
+//                        uid = recipeApply.getUid();
+//                    } else {
+//                        RecipeReimbursement recipeReimbursement = reimbursementMapper.findById(Long.parseLong(recipeId));
+//                        feeTotal = recipeReimbursement.getFeeTotal();
+//                        remark = recipeReimbursement.getRemark();
+//                        uid = recipeReimbursement.getUid();
+//                    }
                     String username = personMapper.findById(uid).getNamZh();
 
                     // 业务类型、金额、提交人、事由、停留时长、接收时间、操作
