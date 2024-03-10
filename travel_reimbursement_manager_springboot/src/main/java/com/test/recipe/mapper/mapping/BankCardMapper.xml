@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.recipe.mapper.BankCardMapper">
+
+
+    <sql id="Base_Column_List">
+        id
+        , owner_id, card_number, bank, area, create_time, update_time
+    </sql>
+
+    <insert id="insert" parameterType="com.test.recipe.model.BankCard">
+        INSERT
+        bank_card (owner_id, card_number, bank, area, create_time, update_time)
+        VALUES (
+        #{ownerId},
+        #{cardNumber},
+        #{bank},
+        #{area},
+        #{creaeTime},
+        #{updateTime}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.test.recipe.model.BankCard">
+        UPDATE bank_card
+        SET owner_id    = #{ownerId},
+            card_number = #{cardNumber},
+            bank        = #{bank},
+            area        = #{area},
+            create_time = #{createTime},
+            update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE
+        FROM bank_card
+        WHERE id = #{id}
+    </delete>
+
+    <select id="findById" resultType="com.test.recipe.model.BankCard" parameterType="long">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM bank_card
+        WHERE id = #{id}
+    </select>
+
+    <select id="findAll" resultType="com.test.recipe.model.BankCard">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM bank_card
+    </select>
+
+    <select id="findByOwnerId" resultType="com.test.recipe.model.BankCard" parameterType="long">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM bank_card
+        WHERE owner_id = #{ownerId}
+    </select>
+
+</mapper>

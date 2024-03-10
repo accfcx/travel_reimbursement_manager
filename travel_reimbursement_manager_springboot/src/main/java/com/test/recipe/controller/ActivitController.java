@@ -1,8 +1,8 @@
 package com.test.recipe.controller;
 
-import com.test.recipe.mapper.PmsModelDao;
+import com.test.recipe.mapper.ProcessDefMapper;
 import com.test.recipe.dto.BpmRequest;
-import com.test.recipe.model.PmsModel;
+import com.test.recipe.model.ProcessDef;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.bpmn.model.*;
 import org.activiti.engine.HistoryService;
@@ -43,7 +43,7 @@ public class ActivitController {
     private RuntimeService runtimeService;
 
     @Autowired
-    private PmsModelDao pmsModelRepository;
+    private ProcessDefMapper pmsModelRepository;
 
     @Autowired
     private HistoryService historyService;
@@ -52,7 +52,7 @@ public class ActivitController {
     @PostMapping("/deployXml")
     public void savePmsModel(@RequestBody BpmRequest bpmRequest) {
 
-        PmsModel model = pmsModelRepository.findById(bpmRequest.getId());
+        ProcessDef model = pmsModelRepository.findById(bpmRequest.getId());
 
         String xmlStr = model.getModelXml();
 
@@ -63,7 +63,7 @@ public class ActivitController {
         // 保存流程定义到数据库
         Deployment deploy = deploymentBuilder.deploy();
 
-        PmsModel pmsModel = new PmsModel();
+        ProcessDef pmsModel = new ProcessDef();
         pmsModel.setModelXml(xmlStr);
         pmsModel.setUserName(model.getUserName());
         pmsModel.setModelName(model.getModelName());

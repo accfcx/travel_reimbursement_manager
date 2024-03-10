@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.recipe.mapper.ProcessDefMapper">
+    <insert id="insert">
+        insert into process_def (process_name, process_key, process_xml, recipe_type, submit_uid, update_uid, status,
+                                create_time, update_time)
+            value (#{processName}, #{processKey}, #{processXml}, #{recipeType}, #{submitUid}, #{updateUid}, #{status},
+            #{createTime}, #{updateTime})
+    </insert>
+
+    <select id="findById" resultType="com.test.recipe.model.ProcessDef">
+        select *
+        from process_def
+        where id = #{id}
+    </select>
+
+    <update id="update">
+        update process_def
+        set process_name = #{processName},
+            process_key  = #{processKey},
+            process_xml  = #{processXml},
+            recipe_type  = #{recipeType},
+            submit_uid   = #{submitUid},
+            update_uid   = #{updateUid},
+            status       = #{status},
+            create_time  = #{createTime},
+            update_time  = #{updateTime}
+        where id = #{id}
+    </update>
+
+    <select id="findAll" resultType="com.test.recipe.model.ProcessDef">
+        select id,
+               process_name,
+               process_key,
+               process_xml,
+               recipe_type,
+               submit_uid,
+               update_uid,
+               status,
+               create_time,
+               update_time
+        from process_def
+    </select>
+
+</mapper>

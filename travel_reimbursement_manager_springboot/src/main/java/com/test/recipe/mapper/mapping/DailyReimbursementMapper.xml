@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.test.recipe.mapper.DailyReimbursementMapper">
+    <!--    <resultMap id="DailyReimbursementMap" type="com.example.demo.entity.DailyReimbursement">-->
+    <!--        <id property="id" column="id"/>-->
+    <!--        <result property="recipeId" column="recipe_id"/>-->
+    <!--        <result property="bankCardId" column="bank_card_id"/>-->
+    <!--        <result property="reason" column="reason"/>-->
+    <!--    </resultMap>-->
+
+    <select id="selectDailyReimbursement" resultType="com.test.recipe.model.DailyReimbursement">
+        SELECT *
+        FROM daily_reimbursement
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectAllDailyReimbursements" resultType="com.test.recipe.model.DailyReimbursement">
+        SELECT *
+        FROM daily_reimbursement
+    </select>
+
+    <insert id="insertDailyReimbursement" parameterType="com.test.recipe.model.DailyReimbursement"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO daily_reimbursement(recipe_id, bank_card_id, reason)
+        VALUES (#{recipeId}, #{bankCardId}, #{reason})
+    </insert>
+
+    <update id="updateDailyReimbursement" parameterType="com.test.recipe.model.DailyReimbursement">
+        UPDATE daily_reimbursement
+        SET recipe_id    = #{recipeId},
+            bank_card_id = #{bankCardId},
+            reason       = #{reason}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteDailyReimbursement">
+        DELETE
+        FROM daily_reimbursement
+        WHERE id = #{id}
+    </delete>
+</mapper>

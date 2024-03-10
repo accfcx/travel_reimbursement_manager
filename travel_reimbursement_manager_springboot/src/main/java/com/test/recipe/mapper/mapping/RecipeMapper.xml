@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.recipe.mapper.RecipeMapper">
+    <resultMap id="RecipeMap" type="com.test.recipe.model.Recipe">
+        <id property="id" column="id"/>
+        <result property="no" column="no"/>
+        <result property="recipeType" column="recipe_type"/>
+        <result property="amount" column="amount"/>
+        <result property="uid" column="uid"/>
+        <result property="departmentId" column="department_id"/>
+        <result property="reason" column="reason"/>
+        <result property="recipeStatus" column="recipe_status"/>
+    </resultMap>
+
+    <select id="selectRecipe" resultMap="RecipeMap">
+        SELECT *
+        FROM recipe
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectAllRecipes" parameterType="com.test.recipe.model.Recipe" resultMap="RecipeMap">
+        SELECT *
+        FROM recipe
+        <where>
+            <if test="id != null">
+                AND id = #{id}
+            </if>
+            <if test="recipeId != null">
+                AND recipe_id = #{recipeId}
+            </if>
+            <if test="startDate != null">
+                AND start_date = #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND end_date = #{endDate}
+            </if>
+            <if test="purpose != null">
+                AND purpose = #{purpose}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="insertRecipe" parameterType="com.test.recipe.model.Recipe" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO recipe(no, recipe_type, amount, uid, department_id, reason, recipe_status)
+        VALUES (#{no}, #{recipeType}, #{amount}, #{uid}, #{departmentId}, #{reason}, #{recipeStatus})
+    </insert>
+
+    <update id="updateRecipe" parameterType="com.test.recipe.model.Recipe">
+        UPDATE recipe
+        SET no            = #{no},
+            recipe_type   = #{recipeType},
+            amount        = #{amount},
+            uid           = #{uid},
+            department_id = #{departmentId},
+            reason        = #{reason},
+            recipe_status = #{recipeStatus}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteRecipe">
+        DELETE
+        FROM recipe
+        WHERE id = #{id}
+    </delete>
+</mapper>

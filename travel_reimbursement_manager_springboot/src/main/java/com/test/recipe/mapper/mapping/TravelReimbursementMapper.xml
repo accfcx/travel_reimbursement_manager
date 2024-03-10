@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.recipe.mapper.TravelReimbursementMapper">
+    <!--    <resultMap id="TravelReimbursementMap" type="com.example.demo.entity.TravelReimbursement">-->
+    <!--        <id property="id" column="id" />-->
+    <!--        <result property="recipeId" column="recipe_id" />-->
+    <!--        <result property="applicationId" column="application_id" />-->
+    <!--        <result property="bankCardId" column="bank_card_id" />-->
+    <!--        <result property="purpose" column="purpose" />-->
+    <!--    </resultMap>-->
+
+    <select id="selectTravelReimbursement" resultType="com.test.recipe.model.TravelReimbursement">
+        SELECT *
+        FROM travel_reimbursement
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectAllTravelReimbursements" resultType="com.test.recipe.model.TravelReimbursement">
+        SELECT *
+        FROM travel_reimbursement
+    </select>
+
+    <insert id="insertTravelReimbursement" parameterType="com.test.recipe.model.TravelReimbursement"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO travel_reimbursement(recipe_id, application_id, bank_card_id, purpose)
+        VALUES (#{recipeId}, #{applicationId}, #{bankCardId}, #{purpose})
+    </insert>
+
+    <update id="updateTravelReimbursement" parameterType="com.test.recipe.model.TravelReimbursement">
+        UPDATE travel_reimbursement
+        SET recipe_id      = #{recipeId},
+            application_id = #{applicationId},
+            bank_card_id   = #{bankCardId},
+            purpose        = #{purpose}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteTravelReimbursement">
+        DELETE
+        FROM travel_reimbursement
+        WHERE id = #{id}
+    </delete>
+</mapper>

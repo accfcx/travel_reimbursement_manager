@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.recipe.mapper.PersonMapper">
+
+
+    <insert id="insert" parameterType="com.test.recipe.model.Person">
+        INSERT INTO Person (username, name_zh, password, department_id)
+        VALUES (#{username}, #{nameZh}, #{password}, #{departmentId})
+    </insert>
+
+    <update id="update" parameterType="com.test.recipe.model.Person">
+        UPDATE Person
+        SET username      = #{username},
+            name_zh       = #{nameZh},
+            password      = #{password},
+            department_id = #{departmentId}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE
+        FROM Person
+        WHERE id = #{id}
+    </delete>
+
+    <select id="findById" resultType="com.test.recipe.model.Person">
+        SELECT id, username, name_zh, password, department_id
+        FROM Person
+        WHERE id = #{id}
+    </select>
+
+    <select id="findByName" resultType="com.test.recipe.model.Person">
+        SELECT id, username, name_zh, password, department_id
+        FROM Person
+        WHERE username = #{username}
+            limit 1
+    </select>
+
+    <select id="findAll" resultType="com.test.recipe.model.Person">
+        SELECT id, username, name_zh, password, department_id
+        FROM Person
+    </select>
+
+    <select id="findByDepartmentId" resultType="com.test.recipe.model.Person">
+        SELECT id, username, name_zh, password, department_id
+        FROM Person
+        WHERE department_id = #{departmentId}
+    </select>
+
+</mapper>

@@ -6,19 +6,22 @@ server:
 spring:
   #配置数据源
   datasource:
-    url: jdbc:mysql://localhost:3306/travel?autoReconnect=true&useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF8&zeroDateTimeBehavior=convertToNull&useSSL=true
     username: root
-    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    password:
   servlet:
     multipart: #设置上传文件大小
       enabled: true
       max-file-size: 2MB #设置单个文件的大小
       max-request-size: 2MB #设置单次请求的文件的总大小
+  activiti:
+    database-schema-update: true
+    db-history-used: true
 
 #MyBatis-Plus配置
 mybatis-plus:
-  mapper-locations: classpath:com/test/recipe/dao/mapping/*.xml
+  mapper-locations: classpath:com/test/recipe/mapper/mapping/*.xml
   type-aliases-package: com.test.recipe.*
 
 #上传文件配置

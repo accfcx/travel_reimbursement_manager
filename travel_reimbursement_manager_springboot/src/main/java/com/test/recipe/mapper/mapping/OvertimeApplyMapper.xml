@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.test.recipe.mapper.OvertimeApplyMapper">
+    <!--    <resultMap id="OvertimeApplyMap" type="com.example.demo.entity.OvertimeApply">-->
+    <!--        <id property="id" column="id"/>-->
+    <!--        <result property="recipeId" column="recipe_id"/>-->
+    <!--        <result property="startDate" column="start_date"/>-->
+    <!--        <result property="endDate" column="end_date"/>-->
+    <!--        <result property="hours" column="hours"/>-->
+    <!--        <result property="reason" column="reason"/>-->
+    <!--    </resultMap>-->
+
+    <select id="selectOvertimeApply" resultType="com.test.recipe.model.OvertimeApply">
+        SELECT *
+        FROM overtime_apply
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectAllOvertimeApplys" resultType="com.test.recipe.model.OvertimeApply">
+        SELECT *
+        FROM overtime_apply
+    </select>
+
+    <insert id="insertOvertimeApply" parameterType="com.test.recipe.model.OvertimeApply" useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO overtime_apply(recipe_id, start_date, end_date, hours, reason)
+        VALUES (#{recipeId}, #{startDate}, #{endDate}, #{hours}, #{reason})
+    </insert>
+
+    <update id="updateOvertimeApply" parameterType="com.test.recipe.model.OvertimeApply">
+        UPDATE overtime_apply
+        SET recipe_id  = #{recipeId},
+            start_date = #{startDate},
+            end_date   = #{endDate},
+            hours      = #{hours},
+            reason     = #{reason}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteOvertimeApply">
+        DELETE
+        FROM overtime_apply
+        WHERE id = #{id}
+    </delete>
+</mapper>

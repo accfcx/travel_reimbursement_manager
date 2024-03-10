@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * @ClassName TravelApplication
- * @Description TODO
  * @Author LiJian
  * @Date 2023/1/28
  * @Version 1.0

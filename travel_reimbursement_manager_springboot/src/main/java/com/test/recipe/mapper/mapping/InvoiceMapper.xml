@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.test.recipe.mapper.InvoiceMapper">
+
+    <resultMap id="BaseResultMap" type="com.test.recipe.model.Invoice">
+        <id column="id" property="id" />
+        <result column="invoice_number" property="invoiceNumber" />
+        <result column="amount" property="amount" />
+        <result column="date" property="date" />
+        <result column="receipt_id" property="receiptId" />
+        <!-- Add other fields here -->
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, invoice_number, amount, date, receipt_id <!-- Add other columns here -->
+    </sql>
+
+    <insert id="insert" parameterType="com.test.recipe.model.Invoice">
+        INSERT INTO Invoice (invoice_number,amount, date,receipt_id ) VALUES (#{invoiceNumber}, #{amount}, #{date}, #{receiptId}) <!-- Add other columns here -->
+    </insert>
+
+    <update id="update" parameterType="com.test.recipe.model.Invoice">
+        UPDATE Invoice SET
+                           invoice_number = #{invoiceNumber} ,
+                           amount = #{amount},
+                           date = #{date},
+                           receipt_id = #{receiptId}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM Invoice WHERE id = #{id}
+    </delete>
+
+    <select id="findById" resultMap="BaseResultMap" parameterType="long">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM Invoice
+        WHERE id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM Invoice
+    </select>
+
+    <select id="findByReceiptId" resultMap="BaseResultMap" parameterType="int">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM Invoice
+        WHERE receipt_id = #{receiptId}
+    </select>
+
+</mapper>

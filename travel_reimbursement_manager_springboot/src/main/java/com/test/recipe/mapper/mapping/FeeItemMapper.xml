@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.test.recipe.mapper.FeeItemMapper">
+
+    <resultMap id="BaseResultMap" type="com.test.recipe.model.FeeItem">
+        <id column="id" property="id" />
+        <result column="type" property="type" />
+        <result column="purpose" property="purpose" />
+        <result column="car_type" property="carType" />
+        <result column="start_city" property="startCity" />
+        <result column="end_city" property="endCity" />
+        <result column="city" property="city" />
+        <result column="date_list" property="dateList" />
+        <result column="amount" property="amount" />
+        <result column="currency" property="currency" />
+        <result column="remark" property="remark" />
+        <result column="receipt_id" property="receiptId" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, type, purpose, car_type, start_city, end_city, city, date_list, amount, currency, remark, receipt_id
+    </sql>
+
+    <insert id="insert" parameterType="com.test.recipe.model.FeeItem">
+        INSERT INTO FeeItem ( type, purpose, car_type, start_city, end_city, city, date_list, amount, currency, remark, receipt_id)
+        VALUES ( #{type}, #{purpose}, #{carType}, #{startCity}, #{endCity}, #{city}, #{dateList}, #{amount}, #{currency}, #{remark}, #{receiptId})
+    </insert>
+
+    <update id="update" parameterType="com.test.recipe.model.FeeItem">
+        UPDATE FeeItem
+        SET type = #{type}, purpose = #{purpose}, car_type = #{carType}, start_city = #{startCity}, end_city = #{endCity},
+            city = #{city}, date_list = #{dateList}, amount = #{amount}, currency = #{currency}, remark = #{remark}, receipt_id = #{receiptId}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM FeeItem WHERE id = #{id}
+    </delete>
+
+    <select id="findById" resultMap="BaseResultMap" parameterType="long">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM FeeItem
+        WHERE id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM FeeItem
+    </select>
+
+    <select id="findByReceiptId" resultMap="BaseResultMap" parameterType="long">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM FeeItem
+        WHERE receipt_id = #{receiptId}
+    </select>
+
+</mapper>

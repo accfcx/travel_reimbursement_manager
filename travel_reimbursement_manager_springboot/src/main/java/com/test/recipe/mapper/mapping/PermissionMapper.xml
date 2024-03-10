@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.test.recipe.mapper.PermissionMapper">
+
+    <resultMap id="BaseResultMap" type="com.test.recipe.model.Permission">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="role" property="role" />
+        <!-- Add other fields here -->
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, name, role
+    </sql>
+
+    <insert id="insert" parameterType="com.test.recipe.model.Permission">
+        INSERT INTO Permission (id, name) VALUES (#{id}, #{name}) <!-- Add other columns here -->
+    </insert>
+
+    <update id="update" parameterType="com.test.recipe.model.Permission">
+        UPDATE Permission SET name = #{name} WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM Permission WHERE id = #{id}
+    </delete>
+
+    <select id="findById" resultMap="BaseResultMap" parameterType="long">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM Permission
+        WHERE id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM Permission
+    </select>
+
+</mapper>

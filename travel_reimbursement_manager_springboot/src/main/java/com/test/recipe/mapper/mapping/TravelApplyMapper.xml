@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.recipe.mapper.TravelApplyMapper">
+    <!--    <resultMap id="TravelApplyMap" type="com.test.recipe.model.TravelApply">-->
+    <!--        <id property="id" column="id" />-->
+    <!--        <result property="recipeId" column="recipe_id" />-->
+    <!--        <result property="startDate" column="start_date" />-->
+    <!--        <result property="endDate" column="end_date" />-->
+    <!--        <result property="purpose" column="purpose" />-->
+    <!--    </resultMap>-->
+
+    <select id="selectTravelApply" resultType="com.test.recipe.model.TravelApply">
+        SELECT *
+        FROM travel_apply
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectAllTravelApplys" resultType="com.test.recipe.model.TravelApply">
+        SELECT *
+        FROM travel_apply
+    </select>
+
+    <insert id="insertTravelApply" parameterType="com.test.recipe.model.TravelApply" useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO travel_apply(recipe_id, start_date, end_date, purpose)
+        VALUES (#{recipeId}, #{startDate}, #{endDate}, #{purpose})
+    </insert>
+
+    <update id="updateTravelApply" parameterType="com.test.recipe.model.TravelApply">
+        UPDATE travel_apply
+        SET recipe_id  = #{recipeId},
+            start_date = #{startDate},
+            end_date   = #{endDate},
+            purpose    = #{purpose}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteTravelApply">
+        DELETE
+        FROM travel_apply
+        WHERE id = #{id}
+    </delete>
+</mapper>
