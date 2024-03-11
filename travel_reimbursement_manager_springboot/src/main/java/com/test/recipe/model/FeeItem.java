@@ -11,25 +11,15 @@ import java.util.Date;
 @Data
 public class FeeItem {
     Long id;
-    String type;
-
-    String purpose;
-    String carType;
-
-    String startCity;
-
-    String endCity;
-
-    String city;
-
-    String dateList;
-
+    Long recipeId;
+    String feeType;
+    Date startDate;
+    Date endDate;
     BigDecimal amount;
-    String currency;
-    String remark;
-
-    Long receiptId;
-
+    String startCity;
+    String endCity;
+    String purpose;
+    int peopleCount;
 
     Date createTime;
 

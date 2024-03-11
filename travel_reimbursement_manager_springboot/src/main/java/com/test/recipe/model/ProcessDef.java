@@ -17,6 +17,7 @@ public class ProcessDef {
     Long submitUid;
     Long updateUid;
     int status;
+    String processDefinitionKey;
     Date createTime;
     Date updateTime;
 }

@@ -43,36 +43,11 @@ public class ActivitController {
     private RuntimeService runtimeService;
 
     @Autowired
-    private ProcessDefMapper pmsModelRepository;
+    private ProcessDefMapper processDefMapper;
 
     @Autowired
     private HistoryService historyService;
 
-    //    流程部署
-    @PostMapping("/deployXml")
-    public void savePmsModel(@RequestBody BpmRequest bpmRequest) {
-
-        ProcessDef model = pmsModelRepository.findById(bpmRequest.getId());
-
-        String xmlStr = model.getModelXml();
-
-        DeploymentBuilder deploymentBuilder = repositoryService.createDeployment();
-        // 添加 BPMN XML 到流程定义
-        deploymentBuilder.addString(model.getModelKey() + ".bpmn20.xml", xmlStr).name(model.getModelName());
-
-        // 保存流程定义到数据库
-        Deployment deploy = deploymentBuilder.deploy();
-
-        ProcessDef pmsModel = new ProcessDef();
-        pmsModel.setModelXml(xmlStr);
-        pmsModel.setUserName(model.getUserName());
-        pmsModel.setModelName(model.getModelName());
-        pmsModel.setModelKey(model.getModelKey());
-        pmsModel.setId(model.getId());
-        pmsModel.setStatus(1);
-        pmsModelRepository.update(pmsModel);
-        log.info("部署: " + deploy);
-    }
 
     @GetMapping("/definition/{processDefinitionKey}")
     public String getProcessDefinitionXML(@PathVariable String processDefinitionKey) {

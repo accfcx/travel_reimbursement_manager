@@ -17,6 +17,8 @@ public class ResponseResult<T> {
     private Integer count;
 
     public ResponseResult() {
+        this.code = 0;
+        this.msg = "suc";
     }
 
     public ResponseResult(Integer code, String msg) {

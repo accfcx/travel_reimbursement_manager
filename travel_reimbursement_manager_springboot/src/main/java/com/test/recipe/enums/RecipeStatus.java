@@ -2,22 +2,22 @@ package com.test.recipe.enums;
 
 // 单据状态
 public enum RecipeStatus {
-    INIT(1, "未提交"),
-    APPROVAL(2, "审批中"),
-    REJECTED(3, "已驳回"),
-    PAYED(4, "已付款"),
+    INIT("unSubmit", "未提交"),
+    APPROVAL("approval", "审批中"),
+    REJECTED("deny", "已驳回"),
+    PAYED("payed", "已付款"),
     ;
 
-    Integer code;
+    String code;
     String desc;
 
-    RecipeStatus(Integer code, String desc) {
+    RecipeStatus(String code, String desc) {
         this.code = code;
         this.desc = desc;
     }
 
 
-    public Integer getCode() {
+    public String getCode() {
         return code;
     }
 

@@ -5,59 +5,62 @@
 
 <mapper namespace="com.test.recipe.mapper.FeeItemMapper">
 
-    <resultMap id="BaseResultMap" type="com.test.recipe.model.FeeItem">
-        <id column="id" property="id" />
-        <result column="type" property="type" />
-        <result column="purpose" property="purpose" />
-        <result column="car_type" property="carType" />
-        <result column="start_city" property="startCity" />
-        <result column="end_city" property="endCity" />
-        <result column="city" property="city" />
-        <result column="date_list" property="dateList" />
-        <result column="amount" property="amount" />
-        <result column="currency" property="currency" />
-        <result column="remark" property="remark" />
-        <result column="receipt_id" property="receiptId" />
-    </resultMap>
-
     <sql id="Base_Column_List">
-        id, type, purpose, car_type, start_city, end_city, city, date_list, amount, currency, remark, receipt_id
+        id
+        ,recipe_id, fee_type, start_date, end_date, amount, start_city, end_city, purpose, people_count
     </sql>
 
     <insert id="insert" parameterType="com.test.recipe.model.FeeItem">
-        INSERT INTO FeeItem ( type, purpose, car_type, start_city, end_city, city, date_list, amount, currency, remark, receipt_id)
-        VALUES ( #{type}, #{purpose}, #{carType}, #{startCity}, #{endCity}, #{city}, #{dateList}, #{amount}, #{currency}, #{remark}, #{receiptId})
+        INSERT INTO FeeItem (recipe_id, fee_type, start_date, end_date, amount, start_city, end_city, purpose,
+                             people_count)
+        VALUES (#{recipeId}, #{feeType}, #{startDate}, #{endDate}, #{amount}, #{startCity}, #{endCity}, #{purpose},
+                #{peopleCount})
     </insert>
 
     <update id="update" parameterType="com.test.recipe.model.FeeItem">
         UPDATE FeeItem
-        SET type = #{type}, purpose = #{purpose}, car_type = #{carType}, start_city = #{startCity}, end_city = #{endCity},
-            city = #{city}, date_list = #{dateList}, amount = #{amount}, currency = #{currency}, remark = #{remark}, receipt_id = #{receiptId}
+        SET
         WHERE id = #{id}
     </update>
 
     <delete id="deleteById" parameterType="long">
-        DELETE FROM FeeItem WHERE id = #{id}
+        DELETE
+        FROM FeeItem
+        WHERE id = #{id}
     </delete>
 
-    <select id="findById" resultMap="BaseResultMap" parameterType="long">
+    <select id="findById" resultType="com.test.recipe.model.FeeItem" parameterType="long">
         SELECT
-        <include refid="Base_Column_List" />
+        <include refid="Base_Column_List"/>
         FROM FeeItem
         WHERE id = #{id}
     </select>
 
-    <select id="findAll" resultMap="BaseResultMap">
+    <select id="findAll" resultType="com.test.recipe.model.FeeItem">
         SELECT
-        <include refid="Base_Column_List" />
+        <include refid="Base_Column_List"/>
         FROM FeeItem
     </select>
 
-    <select id="findByReceiptId" resultMap="BaseResultMap" parameterType="long">
+    <select id="findByReceiptId" resultType="com.test.recipe.model.FeeItem" parameterType="long">
         SELECT
-        <include refid="Base_Column_List" />
+        <include refid="Base_Column_List"/>
         FROM FeeItem
         WHERE receipt_id = #{receiptId}
     </select>
+
+    <select id="aggByMonth" resultType="map">
+        SELECT MONTH(CURDATE()) as month, SUM(amount) as total_amount
+        FROM fee_item
+        WHERE YEAR(start_date) = YEAR(CURDATE())
+        GROUP BY MONTH(start_date)
+    </select>
+
+    <select id="aggByFeeType" resultType="map">
+        SELECT fee_type, SUM(amount) as total_amount
+        FROM fee_item
+        GROUP BY fee_type
+    </select>
+
 
 </mapper>

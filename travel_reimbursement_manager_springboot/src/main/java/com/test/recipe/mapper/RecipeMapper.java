@@ -4,6 +4,7 @@ import com.test.recipe.model.Recipe;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface RecipeMapper {
@@ -16,4 +17,7 @@ public interface RecipeMapper {
     int updateRecipe(Recipe recipe);
 
     int deleteRecipe(Long id);
+
+    Map<String, Object> aggByApprovalStatus();
+
 }

@@ -11,11 +11,13 @@ import java.util.List;
 @Mapper
 public interface ProcessDefMapper {
 
-    boolean insert(ProcessDef pmsModel);
+    boolean insert(ProcessDef processDef);
 
     ProcessDef findById(Long id);
 
-    void update(ProcessDef pmsModel);
+    ProcessDef findByType(String recipeType);
+
+    void update(ProcessDef processDef);
 
     List<ProcessDef> findAll();
 

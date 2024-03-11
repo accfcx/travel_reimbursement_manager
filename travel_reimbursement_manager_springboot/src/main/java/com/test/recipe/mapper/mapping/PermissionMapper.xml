@@ -9,7 +9,6 @@
         <id column="id" property="id" />
         <result column="name" property="name" />
         <result column="role" property="role" />
-        <!-- Add other fields here -->
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -33,6 +32,13 @@
         <include refid="Base_Column_List" />
         FROM Permission
         WHERE id = #{id}
+    </select>
+
+    <select id="findByName" resultMap="BaseResultMap" parameterType="long">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM Permission
+        WHERE name = #{name}
     </select>
 
     <select id="findAll" resultMap="BaseResultMap">
