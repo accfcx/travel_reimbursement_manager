@@ -9,50 +9,59 @@
         <id column="id" property="id" />
         <result column="invoice_number" property="invoiceNumber" />
         <result column="amount" property="amount" />
-        <result column="date" property="date" />
-        <result column="receipt_id" property="receiptId" />
-        <!-- Add other fields here -->
+        <result column="invoice_date" property="invoiceDate" />
+        <result column="invoice_type" property="invoiceType" />
+        <result column="recipe_id" property="recipeId" />
     </resultMap>
 
     <sql id="Base_Column_List">
-        id, invoice_number, amount, date, receipt_id <!-- Add other columns here -->
+        id, invoice_number, amount, invoice_date, invoice_type, receipt_id
     </sql>
 
     <insert id="insert" parameterType="com.test.recipe.model.Invoice">
-        INSERT INTO Invoice (invoice_number,amount, date,receipt_id ) VALUES (#{invoiceNumber}, #{amount}, #{date}, #{receiptId}) <!-- Add other columns here -->
+        INSERT INTO invoice (invoice_number, amount, invoice_date, invoice_type, recipe_id)
+        VALUES (#{invoiceNumber}, #{amount}, #{invoiceDate}, #{invoiceType}, #{recipeId})
     </insert>
 
     <update id="update" parameterType="com.test.recipe.model.Invoice">
-        UPDATE Invoice SET
-                           invoice_number = #{invoiceNumber} ,
-                           amount = #{amount},
-                           date = #{date},
-                           receipt_id = #{receiptId}
+        UPDATE Invoice
+        SET invoice_number = #{invoiceNumber},
+            amount         = #{amount},
+            invoice_date   = #{invoiceDate},
+            invoice_type   = #{invoiceType},
+            recipe_id      = #{recipeId}
         WHERE id = #{id}
     </update>
 
     <delete id="deleteById" parameterType="long">
-        DELETE FROM Invoice WHERE id = #{id}
+        DELETE FROM invoice WHERE id = #{id}
     </delete>
 
     <select id="findById" resultMap="BaseResultMap" parameterType="long">
         SELECT
         <include refid="Base_Column_List" />
-        FROM Invoice
+        FROM invoice
+        WHERE id = #{id}
+    </select>
+
+    <select id="findByNum" resultMap="BaseResultMap" parameterType="string">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM invoice
         WHERE id = #{id}
     </select>
 
     <select id="findAll" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List" />
-        FROM Invoice
+        FROM invoice
     </select>
 
-    <select id="findByReceiptId" resultMap="BaseResultMap" parameterType="int">
+    <select id="findByReceiptId" resultMap="BaseResultMap" parameterType="long">
         SELECT
         <include refid="Base_Column_List" />
-        FROM Invoice
-        WHERE receipt_id = #{receiptId}
+        FROM invoice
+        WHERE recipe_id = #{recipeId}
     </select>
 
 </mapper>

@@ -14,6 +14,7 @@ public interface InvoiceMapper {
     void update(Invoice invoice);
     void deleteById(long id);
     Invoice findById(long id);
+    Invoice findByNum(String num);
     List<Invoice> findAll();
     List<Invoice> findByReceiptId(long receiptId);
 }

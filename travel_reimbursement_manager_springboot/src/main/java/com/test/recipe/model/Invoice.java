@@ -14,10 +14,10 @@ public class Invoice {
     Long id;
     String invoiceNumber;
     BigDecimal amount;
-    Date date;
+    String invoiceDate;
+    String invoiceType;
 
-    Long receiptId;
-
+    Long recipeId;
 
     Date createTime;
 
