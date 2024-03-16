@@ -11,5 +11,8 @@ public class OvertimeApply {
     private Date startDate;
     private Date endDate;
     private Integer hours;
-    private String reason;
+
+    Date createTime;
+
+    Date updateTime;
 }

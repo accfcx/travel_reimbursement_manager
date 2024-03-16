@@ -7,44 +7,44 @@
 
     <resultMap id="BaseResultMap" type="com.test.recipe.model.Permission">
         <id column="id" property="id" />
-        <result column="name" property="name" />
+        <result column="uid" property="uid" />
         <result column="role" property="role" />
     </resultMap>
 
     <sql id="Base_Column_List">
-        id, name, role
+        id, uid, role
     </sql>
 
     <insert id="insert" parameterType="com.test.recipe.model.Permission">
-        INSERT INTO Permission (id, name) VALUES (#{id}, #{name}) <!-- Add other columns here -->
+        INSERT INTO permission (uid, role) VALUES (#{uid}, #{role})
     </insert>
 
     <update id="update" parameterType="com.test.recipe.model.Permission">
-        UPDATE Permission SET name = #{name} WHERE id = #{id}
+        UPDATE permission SET role = #{role} WHERE id = #{id}
     </update>
 
     <delete id="deleteById" parameterType="long">
-        DELETE FROM Permission WHERE id = #{id}
+        DELETE FROM permission WHERE id = #{id}
     </delete>
 
     <select id="findById" resultMap="BaseResultMap" parameterType="long">
         SELECT
         <include refid="Base_Column_List" />
-        FROM Permission
+        FROM permission
         WHERE id = #{id}
     </select>
 
-    <select id="findByName" resultMap="BaseResultMap" parameterType="long">
+    <select id="findByUid" resultMap="BaseResultMap" parameterType="long">
         SELECT
         <include refid="Base_Column_List" />
-        FROM Permission
-        WHERE name = #{name}
+        FROM permission
+        WHERE uid = #{uid}
     </select>
 
     <select id="findAll" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List" />
-        FROM Permission
+        FROM permission
     </select>
 
 </mapper>

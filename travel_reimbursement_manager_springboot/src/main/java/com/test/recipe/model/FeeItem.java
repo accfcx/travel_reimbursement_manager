@@ -16,12 +16,15 @@ public class FeeItem {
     Date startDate;
     Date endDate;
     BigDecimal amount;
-    String startCity;
-    String endCity;
-    String purpose;
-    int peopleCount;
 
     Date createTime;
-
     Date updateTime;
+
+    String purpose;
+
+    String startCity;
+    String endCity;
+
+    String month;
+    Long peopleCount = 1L;
 }

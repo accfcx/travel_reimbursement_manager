@@ -8,6 +8,7 @@ import java.util.List;
 @Mapper
 public interface DailyReimbursementMapper {
     DailyReimbursement selectDailyReimbursement(Long id);
+    DailyReimbursement findByRecipeId(Long id);
     List<DailyReimbursement> selectAllDailyReimbursements();
     int insertDailyReimbursement(DailyReimbursement dailyReimbursement);
     int updateDailyReimbursement(DailyReimbursement dailyReimbursement);

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -22,13 +23,13 @@ public class AnalyzeController {
     RecipeMapper recipeMapper;
 
     // 单据表按照审批状态聚合、单据表按照月份聚合、费用项按照类型聚合)
-    @PostMapping("/sum/")
+    @PostMapping("/sum")
     public Map<String, Object> dataMap() {
         Map<String, Object> result = new HashMap<>();
 
-        Map<String, Object> aggStatus = recipeMapper.aggByApprovalStatus();
-        Map<String, Object> aggMonth = feeItemMapper.aggByMonth();
-        Map<String, Object> aggType = feeItemMapper.aggByFeeType();
+        List<Map<String, Object>> aggStatus = recipeMapper.aggByApprovalStatus();
+        List<Map<String, Object>> aggMonth = feeItemMapper.aggByMonth();
+        List<Map<String, Object>> aggType = feeItemMapper.aggByFeeType();
 
         result.put("aggStatus", aggStatus);
         result.put("aggMonth", aggMonth);

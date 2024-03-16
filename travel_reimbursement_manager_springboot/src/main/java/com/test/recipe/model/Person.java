@@ -14,7 +14,7 @@ public class Person {
 
     String username;
 
-    String namZh;
+    String nameZh;
 
     String password;
 

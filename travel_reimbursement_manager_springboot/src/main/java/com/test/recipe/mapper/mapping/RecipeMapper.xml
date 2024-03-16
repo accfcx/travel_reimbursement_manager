@@ -2,26 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.test.recipe.mapper.RecipeMapper">
-    <resultMap id="RecipeMap" type="com.test.recipe.model.Recipe">
-        <id property="id" column="id"/>
-        <result property="no" column="no"/>
-        <result property="recipeType" column="recipe_type"/>
-        <result property="amount" column="amount"/>
-        <result property="uid" column="uid"/>
-        <result property="departmentId" column="department_id"/>
-        <result property="reason" column="reason"/>
-        <result property="recipeStatus" column="recipe_status"/>
-        <result property="denyDetail" column="deny_detail"/>
-        <result property="processInstanceId" column="process_instance_id"/>
-    </resultMap>
 
-    <select id="selectRecipe" resultMap="RecipeMap">
+    <select id="selectRecipe" resultType="com.test.recipe.model.Recipe">
         SELECT *
         FROM recipe
         WHERE id = #{id}
     </select>
 
-    <select id="selectAllRecipes" parameterType="com.test.recipe.model.Recipe" resultMap="RecipeMap">
+    <select id="selectAllRecipes" parameterType="com.test.recipe.model.Recipe"
+            resultType="com.test.recipe.model.Recipe">
         SELECT *
         FROM recipe
         <where>
@@ -30,15 +19,6 @@
             </if>
             <if test="no != null">
                 AND no like CONCAT('%', #{no}, '%')
-            </if>
-            <if test="recipeId != null">
-                AND recipe_id = #{recipeId}
-            </if>
-            <if test="startDate != null">
-                AND start_date = #{startDate}
-            </if>
-            <if test="endDate != null">
-                AND end_date = #{endDate}
             </if>
             <if test="reason != null">
                 AND reason like CONCAT('%', #{reason}, '%')
@@ -53,28 +33,48 @@
                 </foreach>
             </if>
         </where>
-        ORDER BY create_time DESC
+        ORDER BY id DESC
     </select>
 
     <insert id="insertRecipe" parameterType="com.test.recipe.model.Recipe" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO recipe(no, recipe_type, amount, uid, department_id, reason, recipe_status, deny_detail,
-                           process_intance_id)
-        VALUES (#{no}, #{recipeType}, #{amount}, #{uid}, #{departmentId}, #{reason}, #{recipeStatus}, #{denyDetail},
+        INSERT INTO recipe(recipe_type, amount, uid, department_id, reason, recipe_status, deny_detail,
+                           process_instance_id)
+        VALUES (#{recipeType}, #{amount}, #{uid}, #{departmentId}, #{reason}, #{recipeStatus}, #{denyDetail},
                 #{processInstanceId})
     </insert>
 
     <update id="updateRecipe" parameterType="com.test.recipe.model.Recipe">
         UPDATE recipe
-        SET no                 = #{no},
-            recipe_type        = #{recipeType},
-            amount             = #{amount},
-            uid                = #{uid},
-            department_id      = #{departmentId},
-            reason             = #{reason},
-            recipe_status      = #{recipeStatus},
-            deny_detail        = #{denyDetail},
-            process_intance_id = #{processInstanceId},
-            WHERE id = #{id}
+        <set>
+            <if test="no != null">
+                no = #{no},
+            </if>
+            <if test="recipeType != null">
+                recipe_type = #{recipeType},
+            </if>
+            <if test="amount != null">
+                amount = #{amount},
+            </if>
+            <if test="uid != null">
+                uid = #{uid},
+            </if>
+            <if test="departmentId != null">
+                department_id = #{departmentId},
+            </if>
+            <if test="reason != null">
+                reason = #{reason},
+            </if>
+            <if test="recipeStatus != null">
+                recipe_status = #{recipeStatus},
+            </if>
+            <if test="denyDetail != null">
+                deny_detail = #{denyDetail},
+            </if>
+            <if test="processInstanceId != null">
+                process_instance_id = #{processInstanceId}
+            </if>
+        </set>
+        WHERE id = #{id}
     </update>
 
     <delete id="deleteRecipe">

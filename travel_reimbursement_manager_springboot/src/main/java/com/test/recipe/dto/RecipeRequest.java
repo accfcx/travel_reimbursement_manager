@@ -1,9 +1,7 @@
 package com.test.recipe.dto;
 
-import com.test.recipe.model.DailyReimbursement;
-import com.test.recipe.model.OvertimeApply;
-import com.test.recipe.model.TravelApply;
-import com.test.recipe.model.TravelReimbursement;
+import com.test.recipe.enums.FeeType;
+import com.test.recipe.model.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -17,11 +15,12 @@ public class RecipeRequest {
     Long id;
     String no;
     String recipeType;
-    BigDecimal amount;
+    BigDecimal amount = BigDecimal.ZERO;
     Long uid;
     Long departmentId;
     String reason;
     String recipeStatus;
+    String denyDetail;
 
     String processInstanceId;
 
@@ -35,6 +34,8 @@ public class RecipeRequest {
     TravelReimbursement travelReimbursement;
 
     DailyReimbursement dailyReimbursement;
+
+    FeeItem feeItem;
 
     // 报销单/申请单
     String queryRecipeType;

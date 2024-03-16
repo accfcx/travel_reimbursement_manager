@@ -18,6 +18,6 @@ public interface RecipeMapper {
 
     int deleteRecipe(Long id);
 
-    Map<String, Object> aggByApprovalStatus();
+    List<Map<String, Object>> aggByApprovalStatus();
 
 }

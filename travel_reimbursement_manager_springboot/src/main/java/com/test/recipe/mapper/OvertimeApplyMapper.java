@@ -8,6 +8,7 @@ import java.util.List;
 @Mapper
 public interface OvertimeApplyMapper {
     OvertimeApply selectOvertimeApply(Long id);
+    OvertimeApply findByRecipeId(Long id);
     List<OvertimeApply> selectAllOvertimeApplys();
     int insertOvertimeApply(OvertimeApply overtimeApply);
     int updateOvertimeApply(OvertimeApply overtimeApply);

@@ -1,6 +1,6 @@
 package com.test.recipe.enums;
 
-// 差旅目的
+// 差旅申请类型
 public enum TravelTarget {
     BUSINESS_TRIP("businessTrip", "普通差旅"),
     Internal_Meeting("internalMeeting", "内部会议"),

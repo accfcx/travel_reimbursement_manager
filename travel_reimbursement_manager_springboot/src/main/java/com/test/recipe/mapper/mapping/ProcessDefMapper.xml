@@ -3,10 +3,11 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.test.recipe.mapper.ProcessDefMapper">
     <insert id="insert">
-        insert into process_def (process_name, process_key, process_xml, recipe_type, submit_uid, update_uid, status,
-                                create_time, update_time, process_definition_key)
-            value (#{processName}, #{processKey}, #{processXml}, #{recipeType}, #{submitUid}, #{updateUid}, #{status},
-            #{createTime}, #{updateTime}, #{processDefinitionKey})
+        insert into process_def (process_name, process_key, process_xml, publish_process_xml, recipe_type, submit_uid,
+                                 update_uid, status,
+                                 create_time, update_time, process_definition_key, process_definition_id, variables, publish_variables)
+            value (#{processName}, #{processKey}, #{processXml},#{publishProcessXml}, #{recipeType}, #{submitUid}, #{updateUid}, #{status},
+            #{createTime}, #{updateTime}, #{processDefinitionKey}, #{processDefinitionId}, #{variables}, #{publishVariables})
     </insert>
 
     <select id="findById" resultType="com.test.recipe.model.ProcessDef">
@@ -24,34 +25,48 @@
     </select>
 
 
-
     <update id="update">
         update process_def
-        set process_name = #{processName},
-            process_key  = #{processKey},
-            process_xml  = #{processXml},
-            recipe_type  = #{recipeType},
-            submit_uid   = #{submitUid},
-            update_uid   = #{updateUid},
-            status       = #{status},
-            create_time  = #{createTime},
-            update_time  = #{updateTime},
-            process_definition_key  = #{processDefinitionKey},
+        <set>
+            <if test="processName != null">
+                process_name = #{processName},
+            </if>
+            <if test="processKey != null">
+                process_key = #{processKey},
+            </if>
+            <if test="processXml != null">
+                process_xml = #{processXml},
+            </if>
+            <if test="publishProcessXml != null">
+                publish_process_xml = #{publishProcessXml},
+            </if>
+            <if test="submitUid != null">
+                submit_uid = #{submitUid},
+            </if>
+            <if test="updateUid != null">
+                update_uid = #{updateUid},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="processDefinitionKey != null">
+                process_definition_key = #{processDefinitionKey},
+            </if>
+            <if test="processDefinitionId != null">
+                process_definition_id = #{processDefinitionId},
+            </if>
+            <if test="variables != null">
+                variables = #{variables},
+            </if>
+            <if test="publishVariables != null">
+                publish_variables = #{publishVariables},
+            </if>
+        </set>
         where id = #{id}
     </update>
 
     <select id="findAll" resultType="com.test.recipe.model.ProcessDef">
-        select id,
-               process_name,
-               process_key,
-               process_xml,
-               recipe_type,
-               submit_uid,
-               update_uid,
-               status,
-               create_time,
-               update_time,
-               process_definition_key
+        select *
         from process_def
     </select>
 

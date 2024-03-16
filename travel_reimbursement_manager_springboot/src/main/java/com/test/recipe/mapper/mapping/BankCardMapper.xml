@@ -3,10 +3,6 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.test.recipe.mapper.BankCardMapper">
-    <sql id="Base_Column_List">
-        id
-        , owner_id, card_number, bank, area, create_time, update_time
-    </sql>
 
     <insert id="insert" parameterType="com.test.recipe.model.BankCard">
         INSERT
@@ -16,19 +12,33 @@
         #{cardNumber},
         #{bank},
         #{area},
-        #{creaeTime},
+        #{createTime},
         #{updateTime}
         )
     </insert>
 
     <update id="update" parameterType="com.test.recipe.model.BankCard">
         UPDATE bank_card
-        SET owner_id    = #{ownerId},
-            card_number = #{cardNumber},
-            bank        = #{bank},
-            area        = #{area},
-            create_time = #{createTime},
-            update_time = #{updateTime}
+        <set>
+            <if test="ownerId != null">
+                owner_id = #{ownerId},
+            </if>
+            <if test="cardNumber != null">
+                card_number = #{cardNumber},
+            </if>
+            <if test="bank != null">
+                bank = #{bank},
+            </if>
+            <if test="area != null">
+                area = #{area},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime}
+            </if>
+        </set>
         WHERE id = #{id}
     </update>
 
@@ -39,21 +49,18 @@
     </delete>
 
     <select id="findById" resultType="com.test.recipe.model.BankCard" parameterType="long">
-        SELECT
-        <include refid="Base_Column_List"/>
+        SELECT *
         FROM bank_card
         WHERE id = #{id}
     </select>
 
     <select id="findAll" resultType="com.test.recipe.model.BankCard">
-        SELECT
-        <include refid="Base_Column_List"/>
+        SELECT *
         FROM bank_card
     </select>
 
     <select id="findByOwnerId" resultType="com.test.recipe.model.BankCard" parameterType="long">
-        SELECT
-        <include refid="Base_Column_List"/>
+        SELECT *
         FROM bank_card
         WHERE owner_id = #{ownerId}
     </select>

@@ -16,6 +16,6 @@ public interface PermissionMapper {
     void update(Permission permission);
     void deleteById(long id);
     Permission findById(long id);
-    Permission findByName(String name);
+    Permission findByUid(Long uid);
     List<Permission> findAll();
 }

@@ -1,6 +1,7 @@
 package com.test.recipe.enums;
 
-public enum ApplyType {
+// 差旅申请类型
+public enum TravelApplyType {
 
     TRAVEL_APPLY("chinaTravelApply", "差旅申请"),
     REMOTE_DISPATCH("remoteDispatch", "异地派遣"),
@@ -9,7 +10,7 @@ public enum ApplyType {
     String code;
     String desc;
 
-    ApplyType(String code, String desc) {
+    TravelApplyType(String code, String desc) {
         this.code = code;
         this.desc = desc;
     }

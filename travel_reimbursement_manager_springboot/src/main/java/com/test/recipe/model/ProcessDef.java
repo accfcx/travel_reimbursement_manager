@@ -14,10 +14,17 @@ public class ProcessDef {
     String processKey;
     String recipeType;
     String processXml;
+    String publishProcessXml;
     Long submitUid;
+    String submitName;
     Long updateUid;
+    String updateName;
+
     int status;
-    String processDefinitionKey;
+    String processDefinitionKey = "";
+    String processDefinitionId = "";
+    String variables = "";
+    String publishVariables = "";
     Date createTime;
     Date updateTime;
 }

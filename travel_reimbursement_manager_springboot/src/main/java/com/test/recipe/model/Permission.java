@@ -11,7 +11,7 @@ import java.util.Date;
 public class Permission {
     Long id;
 
-    String name;
+    Long uid;
 
     String role;
 

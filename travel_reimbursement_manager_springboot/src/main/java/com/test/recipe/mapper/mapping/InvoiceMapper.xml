@@ -5,61 +5,59 @@
 
 <mapper namespace="com.test.recipe.mapper.InvoiceMapper">
 
-    <resultMap id="BaseResultMap" type="com.test.recipe.model.Invoice">
-        <id column="id" property="id" />
-        <result column="invoice_number" property="invoiceNumber" />
-        <result column="amount" property="amount" />
-        <result column="invoice_date" property="invoiceDate" />
-        <result column="invoice_type" property="invoiceType" />
-        <result column="recipe_id" property="recipeId" />
-    </resultMap>
-
-    <sql id="Base_Column_List">
-        id, invoice_number, amount, invoice_date, invoice_type, receipt_id
-    </sql>
-
     <insert id="insert" parameterType="com.test.recipe.model.Invoice">
         INSERT INTO invoice (invoice_number, amount, invoice_date, invoice_type, recipe_id)
         VALUES (#{invoiceNumber}, #{amount}, #{invoiceDate}, #{invoiceType}, #{recipeId})
     </insert>
 
     <update id="update" parameterType="com.test.recipe.model.Invoice">
-        UPDATE Invoice
-        SET invoice_number = #{invoiceNumber},
-            amount         = #{amount},
-            invoice_date   = #{invoiceDate},
-            invoice_type   = #{invoiceType},
-            recipe_id      = #{recipeId}
+        UPDATE invoice
+        <set>
+            <if test="invoiceNumber != null">
+                invoice_number = #{invoiceNumber},
+            </if>
+            <if test="amount != null">
+                amount = #{amount},
+            </if>
+            <if test="invoiceDate != null">
+                invoice_date = #{invoiceDate},
+            </if>
+            <if test="invoiceType != null">
+                invoice_type = #{invoiceType},
+            </if>
+            <if test="recipeId != null">
+                recipe_id = #{recipeId}
+            </if>
+        </set>
+        SET
         WHERE id = #{id}
     </update>
 
     <delete id="deleteById" parameterType="long">
-        DELETE FROM invoice WHERE id = #{id}
+        DELETE
+        FROM invoice
+        WHERE id = #{id}
     </delete>
 
-    <select id="findById" resultMap="BaseResultMap" parameterType="long">
-        SELECT
-        <include refid="Base_Column_List" />
+    <select id="findById" resultType="com.test.recipe.model.Invoice" parameterType="long">
+        SELECT *
         FROM invoice
         WHERE id = #{id}
     </select>
 
-    <select id="findByNum" resultMap="BaseResultMap" parameterType="string">
-        SELECT
-        <include refid="Base_Column_List" />
+    <select id="findByNum" resultType="com.test.recipe.model.Invoice" parameterType="string">
+        SELECT *
         FROM invoice
         WHERE id = #{id}
     </select>
 
-    <select id="findAll" resultMap="BaseResultMap">
-        SELECT
-        <include refid="Base_Column_List" />
+    <select id="findAll" resultType="com.test.recipe.model.Invoice">
+        SELECT *
         FROM invoice
     </select>
 
-    <select id="findByReceiptId" resultMap="BaseResultMap" parameterType="long">
-        SELECT
-        <include refid="Base_Column_List" />
+    <select id="findByReceiptId" resultType="com.test.recipe.model.Invoice" parameterType="long">
+        SELECT *
         FROM invoice
         WHERE recipe_id = #{recipeId}
     </select>

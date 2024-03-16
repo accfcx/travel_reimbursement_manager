@@ -5,6 +5,7 @@ public enum RecipeStatus {
     INIT("unSubmit", "未提交"),
     APPROVAL("approval", "审批中"),
     REJECTED("deny", "已驳回"),
+    FINISHED("finish", "已完成"),
     PAYED("payed", "已付款"),
     ;
 

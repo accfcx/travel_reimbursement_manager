@@ -1,5 +1,6 @@
 package com.test.recipe.controller;
 
+import com.test.recipe.dto.TaskDto;
 import com.test.recipe.mapper.ProcessDefMapper;
 import com.test.recipe.dto.BpmRequest;
 import com.test.recipe.model.ProcessDef;
@@ -10,6 +11,7 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricActivityInstance;
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.DeploymentBuilder;
@@ -21,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.activiti.engine.task.Task;
+import org.activiti.engine.history.HistoricVariableInstance;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,8 +52,8 @@ public class ActivitController {
     private HistoryService historyService;
 
 
-    @GetMapping("/definition/{processDefinitionKey}")
-    public String getProcessDefinitionXML(@PathVariable String processDefinitionKey) {
+    @GetMapping("/definitionByKey/{processDefinitionKey}")
+    public String getXMLByProcessDefinition(@PathVariable String processDefinitionKey) {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey(processDefinitionKey).latestVersion().singleResult();
         String processDefinitionId = processDefinition.getId();
         InputStream xmlStream = repositoryService.getProcessModel(processDefinitionId);
@@ -58,54 +61,125 @@ public class ActivitController {
         return xml;
     }
 
-    @GetMapping("/getForm")
-    public List<Map<String, Object>> getForm(String taskId) {
-        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-        //获取task对应的表单内容 需要TaskDefinitionKey
-        UserTask userTask = (UserTask) repositoryService.getBpmnModel(task.getProcessDefinitionId()).getFlowElement(task.getTaskDefinitionKey());
-        //外部表单
-        //String formKey = userTask.getFormKey();
-
-        List<FormProperty> formProperties = userTask.getFormProperties();
-
-        List<Map<String, Object>> collect = formProperties.stream().map(formProperty -> {
-            Map<String, Object> map = new LinkedHashMap<>();
-
-            map.put("id", formProperty.getId());
-            map.put("type", formProperty.getType());
-            map.put("name", formProperty.getName());
-            map.put("defaultValue", formProperty.getDefaultExpression());
-
-            //在camunda叫做label 前端转json加了一个name属性 不然取不到值
-            //在camunda叫做defaultValue activiti表单的default 前端转json加了一个default属性 后台对应defaultExpression
-            //type = enum  枚举类型会用
-//                    .setAttribute("formValues", formProperty.getFormValues())
-            //下面没有值 camunda和activiti表单有区别
-//                    .setAttribute("variable", formProperty.getVariable())
-//                    .setAttribute("expression", formProperty.getExpression())
-//                    .setAttribute("datePattern", formProperty.getDatePattern())
-            return map;
-        }).collect(Collectors.toList());
-        return collect;
+    @GetMapping("/definitionById/{processDefinitionId}")
+    public String getXMLByProcessDefinitionId(@PathVariable String processDefinitionId) {
+        InputStream xmlStream = repositoryService.getProcessModel(processDefinitionId);
+        String xml = new Scanner(xmlStream, StandardCharsets.UTF_8.name()).useDelimiter("\\A").next();
+        return xml;
     }
 
-    @GetMapping("/getFormData")
-    public void getFormData(String taskId) {
-        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-
-        //获取task对应的表单内容 需要TaskDefinitionKey
-        UserTask userTask = (UserTask) repositoryService.getBpmnModel(task.getProcessDefinitionId()).getFlowElement(task.getTaskDefinitionKey());
-
-        List<FormProperty> formProperties = userTask.getFormProperties();
-    }
-
-    @GetMapping("/tasks")
-    public List<Task> getTasks(@RequestParam String processDefinitionKey, @RequestParam String assignee) {
-        if (StringUtils.isNotEmpty(processDefinitionKey)) {
-            return taskService.createTaskQuery().processDefinitionKey(processDefinitionKey).taskAssignee(assignee).list();
+    // 获取流程定义的task列表
+    @GetMapping("/definitionById/taskDefinitions/{processDefinitionId}")
+    public List<TaskDto> getTaskDefinitions(@PathVariable String processDefinitionId) {
+        BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinitionId);
+        if (bpmnModel != null) {
+            Collection<FlowElement> flowElements = bpmnModel.getMainProcess().getFlowElements();
+            return flowElements.stream().filter(flowElement -> flowElement instanceof UserTask).map(flowElement -> {
+                String id = flowElement.getId();
+                String name = flowElement.getName();
+                TaskDto dto = new TaskDto();
+                dto.setActivityId(id);
+                dto.setTaskName(name);
+                return dto;
+            }).collect(Collectors.toList());
         }
-        return taskService.createTaskQuery().taskAssignee(assignee).list();
+        return Collections.emptyList();
     }
+
+    // 获取指定流程定义的所有运行中的task
+    @GetMapping("/getRunningTasksById/{processDefinitionId}")
+    public List<TaskDto> getTasks(@PathVariable String processDefinitionId) {
+        List<Task> tasks = taskService.createTaskQuery().processDefinitionId(processDefinitionId).list();
+        return tasks.stream().map(TaskDto::new).collect(Collectors.toList());
+    }
+
+    // 获取流程实例的各种task运行状态
+    @GetMapping("/instanceTaskList/{processInstanceId}")
+    public Map<String, Object> getProcessInstance(@PathVariable String processInstanceId) {
+        ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).includeProcessVariables().singleResult();
+
+        boolean instanceFinished = false;
+
+        String businessKey = null;
+        String name = null;
+        String processDefinitionId = null;
+        Date startTime = null;
+        Date endTime = null;
+        if (instance == null) {
+            instanceFinished = true;
+
+            HistoricProcessInstance instancev2 = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).includeProcessVariables().singleResult();
+            businessKey = instancev2.getBusinessKey();
+            name = instancev2.getProcessDefinitionName();
+            processDefinitionId = instancev2.getProcessDefinitionId();
+            startTime = instancev2.getStartTime();
+            endTime = instancev2.getEndTime();
+        } else {
+            businessKey = instance.getBusinessKey();
+            name = instance.getProcessDefinitionName();
+            processDefinitionId = instance.getProcessDefinitionId();
+            startTime = instance.getStartTime();
+        }
+
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("instanceId", processInstanceId);
+        map.put("businessKey", businessKey);
+        map.put("name", name);
+        map.put("processDefinitionId", processDefinitionId);
+        map.put("startTime", startTime);
+        map.put("endTime", endTime);
+
+        // 获取当前活动节点的 ID
+        List<String> waitingTaskList = new ArrayList<>();
+        if (!instanceFinished) {
+            waitingTaskList = runtimeService.getActiveActivityIds(processInstanceId);
+        }
+
+        List<HistoricVariableInstance> variableInstances = historyService.createHistoricVariableInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .list();
+
+        // 获取已完成节点的id - 生成的task实例id
+        List<HistoricTaskInstance> finishedTaskList = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId).finished().list().stream().collect(Collectors.toList());
+        // 转换为xml 定义的id
+        List<Map<String, Object>> finishedIdList = finishedTaskList.stream().map(task -> {
+            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
+            String xmlId = historicTaskInstance.getTaskDefinitionKey();
+
+            Map<String, Object> formFieldMap = new HashMap<>();
+            variableInstances.forEach(item -> {
+                String variableName = item.getVariableName();
+                Object value = item.getValue();
+                if (variableName.startsWith(task.getTaskDefinitionKey())) {
+                    formFieldMap.put(variableName.substring(task.getTaskDefinitionKey().length() + 1), value);
+                } else {
+                    if (!variableName.contains("_SPLIT_")) {
+                        formFieldMap.put(variableName, value);
+                    }
+                }
+            });
+
+            Map<String, Object> infoMap = new HashMap<>();
+            infoMap.put("taskName", task.getName());
+            infoMap.put("taskId", task.getId());
+            infoMap.put("xmlId", xmlId);
+            infoMap.put("assignee", task.getAssignee());
+            infoMap.put("formFieldMap", formFieldMap);
+
+            return infoMap;
+        }).collect(Collectors.toList());
+
+        map.put("waitingTaskList", waitingTaskList);
+        map.put("finishedTaskList", finishedIdList);
+
+        return map;
+    }
+
+    @PostMapping("/completeTask/{taskId}")
+    public void completeOneTask(@PathVariable String taskId, @RequestBody Map<String, Object> variables) {
+        taskService.complete(taskId, variables);
+    }
+
 
     @GetMapping("/task/{processInstanceId}/{taskDefinitionKey}")
     public String getTaskId(@PathVariable String processInstanceId, @PathVariable String taskDefinitionKey) {
@@ -116,27 +190,6 @@ public class ActivitController {
     @GetMapping("/task/todo")
     public List getTodoTaskForUser(@RequestParam String user) {
         return null;
-    }
-
-    @PostMapping("/task/complete/{taskId}")
-    public void completeOneTask(@PathVariable String taskId, @RequestBody Map<String, Object> variables) {
-        taskService.complete(taskId, variables);
-    }
-
-    @GetMapping("/task/history")
-    public void getTaskHistory(@RequestParam String processDefinitionKey, @RequestParam String processInstanceId, @RequestParam String taskAssignee) {
-        List<HistoricActivityInstance> list = historyService.createHistoricActivityInstanceQuery().activityType("userTask")//只获取用户任务
-                .processInstanceId(processInstanceId).taskAssignee(taskAssignee).finished().list();
-        for (HistoricActivityInstance instance : list) {
-            System.out.println("任务名称:" + instance.getActivityName());
-            System.out.println("任务开始时间:" + instance.getStartTime());
-            System.out.println("任务结束时间:" + instance.getEndTime());
-            System.out.println("任务耗时:" + instance.getDurationInMillis());
-            List<Comment> taskComments = taskService.getTaskComments(instance.getTaskId());
-            if (taskComments.size() > 0) {
-                System.out.println("审批批注:" + taskComments.get(0).getFullMessage());
-            }
-        }
     }
 
     @GetMapping("/tasks/{processInstanceId}")
@@ -184,40 +237,6 @@ public class ActivitController {
         return customTaskList;
     }
 
-    @GetMapping("/instance/{processInstanceId}")
-    public Map<String, Object> getProcessInstance(@PathVariable String processInstanceId) {
-
-        ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).includeProcessVariables().singleResult();
-
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put("instanceId", instance.getId());
-        map.put("businessKey", instance.getBusinessKey());
-        map.put("name", instance.getName());
-        map.put("deploymentId", instance.getDeploymentId());
-        map.put("processDefinitionId", instance.getProcessDefinitionId());
-        map.put("startTime", instance.getStartTime());
-        map.put("startUserId", instance.getStartUserId());
-
-        // 获取当前活动节点的 ID
-        List<String> activeActivityIds = runtimeService.getActiveActivityIds(instance.getId());
-
-        // 获取已完成节点的id - 生成的task实例id
-        List<String> finishedTaskIdList = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId).finished().list().stream().map(TaskInfo::getId).collect(Collectors.toList());
-
-        // 转换为xml 定义的id
-        List<String> finishedIdList = finishedTaskIdList.stream().map(taskId -> {
-            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
-            String xmlId = historicTaskInstance.getTaskDefinitionKey();
-            return xmlId;
-        }).collect(Collectors.toList());
-
-        List<String> lineIdList = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).activityType("sequenceFlow").list().stream().map(item -> item.getId()).collect(Collectors.toList());
-
-        map.put("activeActivityIds", activeActivityIds);
-        map.put("finishedTaskList", finishedIdList);
-
-        return map;
-    }
 
     @GetMapping("/instanceList")
     public List<Map<String, Object>> instanceList() {

@@ -4,46 +4,55 @@
 
 
     <insert id="insert" parameterType="com.test.recipe.model.Person">
-        INSERT INTO Person (username, name_zh, password, department_id)
+        INSERT INTO person (username, name_zh, password, department_id)
         VALUES (#{username}, #{nameZh}, #{password}, #{departmentId})
     </insert>
 
     <update id="update" parameterType="com.test.recipe.model.Person">
-        UPDATE Person
-        SET username      = #{username},
-            name_zh       = #{nameZh},
-            password      = #{password},
-            department_id = #{departmentId}
+        UPDATE person
+        <set>
+            <if test="username != null">
+                username = #{username},
+            </if>
+            <if test="nameZh != null">
+                name_zh = #{nameZh},
+            </if>
+            <if test="password != null">
+                password = #{password},
+            </if>
+            <if test="departmentId != null">
+                department_id = #{departmentId}
+            </if>
+        </set>
         WHERE id = #{id}
     </update>
 
     <delete id="deleteById" parameterType="long">
         DELETE
-        FROM Person
+        FROM person
         WHERE id = #{id}
     </delete>
 
     <select id="findById" resultType="com.test.recipe.model.Person">
-        SELECT id, username, name_zh, password, department_id
-        FROM Person
+        SELECT *
+        FROM person
         WHERE id = #{id}
     </select>
 
     <select id="findByName" resultType="com.test.recipe.model.Person">
-        SELECT id, username, name_zh, password, department_id
-        FROM Person
-        WHERE username = #{username}
-            limit 1
+        SELECT *
+        FROM person
+        WHERE username = #{username} limit 1
     </select>
 
     <select id="findAll" resultType="com.test.recipe.model.Person">
-        SELECT id, username, name_zh, password, department_id
-        FROM Person
+        SELECT *
+        FROM person
     </select>
 
     <select id="findByDepartmentId" resultType="com.test.recipe.model.Person">
-        SELECT id, username, name_zh, password, department_id
-        FROM Person
+        SELECT *
+        FROM person
         WHERE department_id = #{departmentId}
     </select>
 

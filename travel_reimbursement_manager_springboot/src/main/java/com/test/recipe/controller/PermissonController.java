@@ -21,9 +21,8 @@ public class PermissonController {
 
     @PostMapping("/isAdmin/{uid}")
     public Boolean isAdmin(@PathVariable Long uid) {
-        Person person = personMapper.findById(uid);
 
-        Permission permission = permissionMapper.findByName(person.getUsername());
+        Permission permission = permissionMapper.findByUid(uid);
 
         if ("admin".equals(permission.getRole())) {
             return true;

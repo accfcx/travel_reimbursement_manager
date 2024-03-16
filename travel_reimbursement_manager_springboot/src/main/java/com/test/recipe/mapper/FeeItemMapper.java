@@ -21,9 +21,9 @@ public interface FeeItemMapper {
 
     List<FeeItem> findAll();
 
-    FeeItem findByReceiptId(long receiptId);
+    FeeItem findByReceiptId(long id);
 
-    Map<String, Object> aggByMonth();
+    List<Map<String, Object>> aggByMonth();
 
-    Map<String, Object> aggByFeeType();
+    List<Map<String, Object>> aggByFeeType();
 }

@@ -8,6 +8,7 @@ import java.util.List;
 @Mapper
 public interface TravelApplyMapper {
     TravelApply selectTravelApply(Long id);
+    TravelApply findByRecipeId(Long id);
     List<TravelApply> selectAllTravelApplys();
     int insertTravelApply(TravelApply travelApply);
     int updateTravelApply(TravelApply travelApply);

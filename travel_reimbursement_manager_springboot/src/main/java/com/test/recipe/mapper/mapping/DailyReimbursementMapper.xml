@@ -4,18 +4,20 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.test.recipe.mapper.DailyReimbursementMapper">
-    <!--    <resultMap id="DailyReimbursementMap" type="com.example.demo.entity.DailyReimbursement">-->
-    <!--        <id property="id" column="id"/>-->
-    <!--        <result property="recipeId" column="recipe_id"/>-->
-    <!--        <result property="bankCardId" column="bank_card_id"/>-->
-    <!--        <result property="reason" column="reason"/>-->
-    <!--    </resultMap>-->
 
     <select id="selectDailyReimbursement" resultType="com.test.recipe.model.DailyReimbursement">
         SELECT *
         FROM daily_reimbursement
         WHERE id = #{id}
     </select>
+
+
+    <select id="findByRecipeId" resultType="com.test.recipe.model.DailyReimbursement">
+        SELECT *
+        FROM daily_reimbursement
+        WHERE recipe_id = #{id}
+    </select>
+
 
     <select id="selectAllDailyReimbursements" resultType="com.test.recipe.model.DailyReimbursement">
         SELECT *
@@ -24,15 +26,20 @@
 
     <insert id="insertDailyReimbursement" parameterType="com.test.recipe.model.DailyReimbursement"
             useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO daily_reimbursement(recipe_id, bank_card_id, reason)
-        VALUES (#{recipeId}, #{bankCardId}, #{reason})
+        INSERT INTO daily_reimbursement(recipe_id, bank_card_id)
+        VALUES (#{recipeId}, #{bankCardId})
     </insert>
 
     <update id="updateDailyReimbursement" parameterType="com.test.recipe.model.DailyReimbursement">
         UPDATE daily_reimbursement
-        SET recipe_id    = #{recipeId},
-            bank_card_id = #{bankCardId},
-            reason       = #{reason}
+        <set>
+            <if test="recipeId != null">
+                recipe_id = #{recipeId},
+            </if>
+            <if test="bankCardId != null">
+                bank_card_id = #{bankCardId},
+            </if>
+        </set>
         WHERE id = #{id}
     </update>
 

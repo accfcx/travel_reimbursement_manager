@@ -2,37 +2,44 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.test.recipe.mapper.DepartmentMapper">
-    <resultMap id="DepartmentResultMap" type="com.test.recipe.model.Department">
-        <id property="id" column="id"/>
-        <result property="parentId" column="parent_department_id"/>
-        <result property="name" column="name"/>
-    </resultMap>
 
     <insert id="insert" parameterType="com.test.recipe.model.Department">
-        INSERT INTO Department (parent_department_id, name)
-        VALUES (#{parentDepartmentId}, #{name})
+        INSERT INTO department (parent_department_id, name, leader_id)
+        VALUES (#{parentDepartmentId}, #{name}, #{leaderId})
     </insert>
 
     <update id="update" parameterType="com.test.recipe.model.Department">
-        UPDATE Department
-        SET parent_department_id = #{parentDepartmentId},
-            name = #{name}
+        UPDATE department
+        <set>
+            <if test="parentDepartmentId != null">
+                parent_department_id = #{parentDepartmentId},
+            </if>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="leaderId != null">
+                leader_id = #{leaderId},
+            </if>
+
+        </set>
+        SET
         WHERE id = #{id}
     </update>
 
     <delete id="deleteById" parameterType="int">
-        DELETE FROM Department
+        DELETE
+        FROM department
         WHERE id = #{id}
     </delete>
 
-    <select id="findById" resultMap="DepartmentResultMap" parameterType="int">
-        SELECT id, parent_department_id, name
-        FROM Department
+    <select id="findById" resultType="com.test.recipe.model.Department" parameterType="long">
+        SELECT *
+        FROM department
         WHERE id = #{id}
     </select>
 
-    <select id="findAll" resultMap="DepartmentResultMap">
-        SELECT id, parent_department_id, name
-        FROM Department
+    <select id="findAll" resultType="com.test.recipe.model.Department">
+        SELECT *
+        FROM department
     </select>
 </mapper>

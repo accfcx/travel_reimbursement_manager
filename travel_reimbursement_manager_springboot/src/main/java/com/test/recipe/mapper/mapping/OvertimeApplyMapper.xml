@@ -4,20 +4,20 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.test.recipe.mapper.OvertimeApplyMapper">
-    <!--    <resultMap id="OvertimeApplyMap" type="com.example.demo.entity.OvertimeApply">-->
-    <!--        <id property="id" column="id"/>-->
-    <!--        <result property="recipeId" column="recipe_id"/>-->
-    <!--        <result property="startDate" column="start_date"/>-->
-    <!--        <result property="endDate" column="end_date"/>-->
-    <!--        <result property="hours" column="hours"/>-->
-    <!--        <result property="reason" column="reason"/>-->
-    <!--    </resultMap>-->
 
     <select id="selectOvertimeApply" resultType="com.test.recipe.model.OvertimeApply">
         SELECT *
         FROM overtime_apply
         WHERE id = #{id}
     </select>
+
+
+    <select id="findByRecipeId" resultType="com.test.recipe.model.OvertimeApply">
+        SELECT *
+        FROM overtime_apply
+        WHERE recipe_id = #{id}
+    </select>
+
 
     <select id="selectAllOvertimeApplys" resultType="com.test.recipe.model.OvertimeApply">
         SELECT *
@@ -26,17 +26,26 @@
 
     <insert id="insertOvertimeApply" parameterType="com.test.recipe.model.OvertimeApply" useGeneratedKeys="true"
             keyProperty="id">
-        INSERT INTO overtime_apply(recipe_id, start_date, end_date, hours, reason)
-        VALUES (#{recipeId}, #{startDate}, #{endDate}, #{hours}, #{reason})
+        INSERT INTO overtime_apply(recipe_id, start_date, end_date, hours)
+        VALUES (#{recipeId}, #{startDate}, #{endDate}, #{hours})
     </insert>
 
     <update id="updateOvertimeApply" parameterType="com.test.recipe.model.OvertimeApply">
         UPDATE overtime_apply
-        SET recipe_id  = #{recipeId},
-            start_date = #{startDate},
-            end_date   = #{endDate},
-            hours      = #{hours},
-            reason     = #{reason}
+        <set>
+            <if test="recipeId != null">
+                recipe_id = #{recipeId},
+            </if>
+            <if test="startDate != null">
+                start_date = #{startDate},
+            </if>
+            <if test="endDate != null">
+                end_date = #{endDate}
+            </if>
+            <if test="hours != null">
+                hours = #{hours}
+            </if>
+        </set>
         WHERE id = #{id}
     </update>
 

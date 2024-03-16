@@ -24,4 +24,13 @@ public enum RecipeType {
     public String getDesc() {
         return desc;
     }
+
+    public static String getDescByCode(String code) {
+        for (RecipeType type : RecipeType.values()) {
+            if (type.getCode().equals(code)) {
+                return type.getDesc();
+            }
+        }
+        return "unknown";
+    }
 }

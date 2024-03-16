@@ -4,49 +4,74 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.test.recipe.mapper.FeeItemMapper">
-
-    <sql id="Base_Column_List">
-        id
-        ,recipe_id, fee_type, start_date, end_date, amount, start_city, end_city, purpose, people_count
-    </sql>
-
     <insert id="insert" parameterType="com.test.recipe.model.FeeItem">
-        INSERT INTO FeeItem (recipe_id, fee_type, start_date, end_date, amount, start_city, end_city, purpose,
-                             people_count)
+        INSERT INTO fee_item (recipe_id, fee_type, start_date, end_date, amount, start_city, end_city, purpose,
+                              people_count)
         VALUES (#{recipeId}, #{feeType}, #{startDate}, #{endDate}, #{amount}, #{startCity}, #{endCity}, #{purpose},
                 #{peopleCount})
     </insert>
 
     <update id="update" parameterType="com.test.recipe.model.FeeItem">
-        UPDATE FeeItem
-        SET
+        UPDATE fee_item
+        <set>
+            <if test="recipeId != null">
+                recipe_id = #{recipeId},
+            </if>
+            <if test="feeType != null">
+                fee_type = #{feeType},
+            </if>
+            <if test="startDate != null">
+                start_date = #{startDate},
+            </if>
+            <if test="endDate != null">
+                end_date = #{endDate}
+            </if>
+            <if test="amount != null">
+                amount= #{amount},
+            </if>
+            <if test="amount != null">
+                start_city= #{startCity},
+            </if>
+            <if test="amount != null">
+                end_city= #{endCity},
+            </if>
+            <if test="purpose != null">
+                purpose= #{purpose},
+            </if>
+            <if test="amount != null">
+                people_count= #{peopleCount}
+            </if>
+            <if test="createTime != null">
+                create_time= #{createTime}
+            </if>
+            <if test="updateTime != null">
+                update_time= #{updateTime}
+            </if>
+        </set>
         WHERE id = #{id}
     </update>
 
     <delete id="deleteById" parameterType="long">
         DELETE
-        FROM FeeItem
+        FROM fee_item
         WHERE id = #{id}
     </delete>
 
     <select id="findById" resultType="com.test.recipe.model.FeeItem" parameterType="long">
-        SELECT
-        <include refid="Base_Column_List"/>
-        FROM FeeItem
+        SELECT *
+        FROM fee_item
         WHERE id = #{id}
     </select>
 
     <select id="findAll" resultType="com.test.recipe.model.FeeItem">
-        SELECT
-        <include refid="Base_Column_List"/>
-        FROM FeeItem
+        SELECT *
+        FROM fee_item
     </select>
 
     <select id="findByReceiptId" resultType="com.test.recipe.model.FeeItem" parameterType="long">
-        SELECT
-        <include refid="Base_Column_List"/>
-        FROM FeeItem
-        WHERE receipt_id = #{receiptId}
+        SELECT *
+        FROM fee_item
+        WHERE recipe_id = #{id}
     </select>
 
     <select id="aggByMonth" resultType="map">
@@ -56,6 +81,7 @@
         GROUP BY MONTH(start_date)
     </select>
 
+
     <select id="aggByFeeType" resultType="map">
         SELECT fee_type, SUM(amount) as total_amount
         FROM fee_item
@@ -64,3 +90,15 @@
 
 
 </mapper>
+
+
+
+
+
+
+
+
+
+
+
+

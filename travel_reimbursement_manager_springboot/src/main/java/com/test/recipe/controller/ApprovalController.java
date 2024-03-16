@@ -1,5 +1,8 @@
 package com.test.recipe.controller;
 
+import com.test.recipe.dto.TaskDto;
+import com.test.recipe.enums.RecipeStatus;
+import com.test.recipe.enums.RecipeType;
 import com.test.recipe.mapper.FeeItemMapper;
 import com.test.recipe.mapper.PersonMapper;
 import com.test.recipe.mapper.RecipeMapper;
@@ -20,9 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -72,70 +73,42 @@ public class ApprovalController {
         List<Task> tasks = taskService.createTaskQuery().taskAssignee(assignee).list();
         // 为每个任务获取接收时间和停留时长
         return tasks.stream().map(task -> {
-                    String taskId = task.getId();
-                    HistoricTaskInstance historicTask = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+            String taskId = task.getId();
+            Date receiveTime = task.getCreateTime();
+            long duration = getTaskDuration(task);
 
-                    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
-                    Date receiveTime = historicTask.getClaimTime();
-                    long duration = getTaskDuration(historicTask);
-                    String businessKey = processInstance.getBusinessKey();
-                    String[] dataList = businessKey.split("##");
-                    String type = dataList[0];
-                    String recipeId = dataList[1];
+            ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
+            String businessKey = processInstance.getBusinessKey();
+            String[] dataList = businessKey.split("##");
+            String recipeId = dataList[1];
 
-                    Long id = Long.parseLong(recipeId);
-                    BigDecimal feeTotal = null;
-                    String reason = null;
-                    Long uid = 0l;
-                    Recipe recipe = recipeMapper.selectRecipe(id);
-                    feeTotal = recipe.getAmount();
-                    reason = recipe.getReason();
-                    uid = recipe.getUid();
-                    String username = personMapper.findById(uid).getNamZh();
+            Long id = Long.parseLong(recipeId);
+            BigDecimal feeTotal = null;
+            String reason = null;
+            Long uid = 0l;
+            Recipe recipe = recipeMapper.selectRecipe(id);
+            feeTotal = recipe.getAmount();
+            reason = recipe.getReason();
+            uid = recipe.getUid();
+            String username = personMapper.findById(uid).getNameZh();
 
-                    FeeItem feeItem = feeItemMapper.findByReceiptId(id);
+            FeeItem feeItem = feeItemMapper.findByReceiptId(id);
+            String feeType = null;
+            if (Objects.nonNull(feeItem)) {
+                feeType = feeItem.getFeeType();
+            }
 
-                    // 业务类型、金额、提交人、事由、停留时长、接收时间、操作
-                    return new TaskInfo(id, recipe.getNo(), type, feeTotal, reason, username, duration, receiveTime, feeItem.getFeeType());
-                }).
-                sorted(Comparator.comparing(TaskInfo::getReceiveTime).reversed()).
-                collect(Collectors.toList());
+            // 业务类型、金额、提交人、事由、停留时长、接收时间、操作
+            return new TaskInfo(id, processInstance.getProcessInstanceId(), taskId, recipe.getNo(), recipe.getRecipeType(), feeTotal, reason, username, duration, receiveTime, feeType);
+        }).sorted(Comparator.comparing(TaskInfo::getReceiveTime).reversed()).collect(Collectors.toList());
     }
 
-    private long getTaskDuration(HistoricTaskInstance task) {
-        Date startTime = task.getStartTime();
-        Date endTime = task.getEndTime();
-        if (endTime != null) {
-            return endTime.getTime() - startTime.getTime();
-        } else {
-            // 任务还没有结束，计算从开始到现在的时长
-            return new Date().getTime() - startTime.getTime();
-        }
-    }
+    private long getTaskDuration(Task task) {
+        Date createTime = task.getCreateTime();
+        Date now = new Date();
 
-//    @GetMapping("/queryFinishedRecipeListForMe/{uid}")
-//    public void getFinishedRecipeList(@PathVariable Long uid) {
-//        Person person = personMapper.findById(uid);
-//
-//        String userId = person.getUsername();
-////        List<HistoricTaskInstance> completedTasks = historyService.createHistoricTaskInstanceQuery()
-////                .taskAssignee(userId)    // 指定审批人
-////                .finished()    // 查询已完成的任务
-////                .list();
-//
-//        // 4. 获取用户已完成的流程实例和businessKey
-//        List<HistoricProcessInstance> completedProcesses = historyService.createHistoricProcessInstanceQuery()
-//                .involvedUser(userId)    // 指定参与者
-//                .finished()    // 查询已完成的流程实例
-//                .list();
-//
-//        for (HistoricProcessInstance completedProcess : completedProcesses) {
-//            String processInstanceId = completedProcess.getId();
-//            String businessKey = completedProcess.getBusinessKey();
-//            // 打印流程实例ID和businessKey
-//            System.out.println("ProcessInstanceId: " + processInstanceId + ", BusinessKey: " + businessKey);
-//        }
-//    }
+        return now.getTime() - createTime.getTime();
+    }
 
     @GetMapping("/queryCompletedTasks/{uid}")
     public List<TaskInfo> queryCompletedTasks(@PathVariable Long uid) {
@@ -149,10 +122,7 @@ public class ApprovalController {
 
     public List<TaskInfo> getCompletedTasksForUser(String assignee) {
         // 查询用户已经完成的任务
-        List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
-                .taskAssignee(assignee)
-                .finished()
-                .list();
+        List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().taskAssignee(assignee).finished().list();
 
         // 为每个任务获取结束时间和处理时长
         return tasks.stream().map(task -> {
@@ -162,9 +132,7 @@ public class ApprovalController {
             String processInstanceId = task.getProcessInstanceId();
 
             // 从流程实例中获取业务键
-            HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
-                    .processInstanceId(processInstanceId)
-                    .singleResult();
+            HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
             String businessKey = processInstance.getBusinessKey();
 
             String[] dataList = businessKey.split("##");
@@ -179,18 +147,60 @@ public class ApprovalController {
             feeTotal = recipe.getAmount();
             reason = recipe.getReason();
             uid = recipe.getUid();
-            String username = personMapper.findById(uid).getNamZh();
+            String username = personMapper.findById(uid).getNameZh();
 
             FeeItem feeItem = feeItemMapper.findByReceiptId(id);
+            String feeType = null;
+            if (Objects.nonNull(feeItem)) {
+                feeType = feeItem.getFeeType();
+            }
 
-            return new TaskInfo(id, recipe.getNo(), type, feeTotal, reason, username, duration, endTime, feeItem.getFeeType());
+
+            return new TaskInfo(id, processInstanceId, taskId, recipe.getNo(), type, feeTotal, reason, username, duration, endTime, feeType);
         }).collect(Collectors.toList());
+    }
+
+    @PostMapping("/complete/{id}")
+    public String complete(@PathVariable Long id, @RequestBody Map<String, Object> variables) {
+        System.out.println(variables);
+
+        Recipe recipe = recipeMapper.selectRecipe(id);
+
+        Task task = taskService.createTaskQuery().processInstanceId(recipe.getProcessInstanceId()).singleResult();
+
+        boolean isDeny = false;
+        for (Map.Entry<String, Object> entry : variables.entrySet()) {
+            runtimeService.setVariable(task.getProcessInstanceId(), task.getTaskDefinitionKey() + "_SPLIT_" + entry.getKey(), entry.getValue());
+            if (!(Boolean) variables.get("approvalResult")) {
+                isDeny = true;
+                String denyDetail = String.valueOf(variables.get("approvalResultDetail"));
+                recipe.setRecipeStatus(RecipeStatus.REJECTED.getCode());
+                recipe.setDenyDetail(task.getTaskDefinitionKey() + "_SPLIT_" + denyDetail);
+                recipeMapper.updateRecipe(recipe);
+            }
+        }
+        taskService.complete(task.getId());
+
+        // 判断是否为最后一个流程
+        if (!isDeny) {
+            ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(recipe.getProcessInstanceId()).includeProcessVariables().singleResult();
+            if (instance == null) {
+                recipe.setRecipeStatus(RecipeStatus.PAYED.getCode());
+                if (RecipeType.OVERTIME_APPLY.getCode().equals(recipe.getRecipeType()) || RecipeType.OVERTIME_APPLY.getCode().equals(recipe.getRecipeType())) {
+                    recipe.setRecipeStatus(RecipeStatus.FINISHED.getCode());
+                }
+                recipeMapper.updateRecipe(recipe);
+            }
+        }
+        return "审批结束";
     }
 
     @Data
     @AllArgsConstructor
     public class TaskInfo {
         Long id;
+        String processInstanceId;
+        String taskId;
         String no;
         String recipeType;
         BigDecimal amount;

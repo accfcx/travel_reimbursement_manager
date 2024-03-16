@@ -1,25 +1,41 @@
 package com.test.recipe.controller;
 
+import com.google.gson.Gson;
 import com.test.recipe.common.ResponseResult;
 import com.test.recipe.dto.BpmRequest;
+import com.test.recipe.dto.VariableDto;
+import com.test.recipe.enums.RecipeType;
+import com.test.recipe.mapper.PersonMapper;
 import com.test.recipe.mapper.ProcessDefMapper;
+import com.test.recipe.model.Person;
 import com.test.recipe.model.ProcessDef;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.w3c.dom.Element;
+
+import java.io.StringReader;
+
+import org.xml.sax.InputSource;
+
+import javax.annotation.Resource;
+import java.util.*;
 
 /**
  * @author accfcx
@@ -43,10 +59,31 @@ public class ProcessController {
     @Autowired
     private HistoryService historyService;
 
+    @Resource
+    PersonMapper personMapper;
+
+    @Resource
+    Gson gson;
+
     // 配置审批模版元信息
     @GetMapping("/modelMetaList")
     public List<ProcessDef> modelMetaList() {
         List<ProcessDef> all = processDefMapper.findAll();
+
+        all.forEach(item -> {
+            Long submitUid = item.getSubmitUid();
+            if (Objects.nonNull(submitUid) && submitUid != 0l) {
+                Person submit = personMapper.findById(submitUid);
+                item.setSubmitName(submit.getNameZh());
+            }
+            Long updateUid = item.getUpdateUid();
+            if (Objects.nonNull(updateUid) && updateUid != 0l) {
+                Person update = personMapper.findById(updateUid);
+                item.setUpdateName(update.getNameZh());
+            }
+
+            item.setRecipeType(RecipeType.getDescByCode(item.getRecipeType()));
+        });
         return all;
     }
 
@@ -65,6 +102,11 @@ public class ProcessController {
         // 添加基础定义
         ProcessDef pmsModel = new ProcessDef();
         pmsModel.setStatus(bpmRequest.getStatus());
+        pmsModel.setProcessName(bpmRequest.getProcessName());
+        pmsModel.setProcessKey(bpmRequest.getProcessKey());
+        pmsModel.setRecipeType(bpmRequest.getRecipeType());
+        pmsModel.setSubmitUid(bpmRequest.getSubmitUid());
+        pmsModel.setUpdateUid(bpmRequest.getSubmitUid());
         pmsModel.setCreateTime(new Date());
         pmsModel.setUpdateTime(new Date());
         processDefMapper.insert(pmsModel);
@@ -72,13 +114,60 @@ public class ProcessController {
         return new ResponseResult();
     }
 
-    @PostMapping("/updateModelMeta")
+    @PostMapping("/saveModelMeta")
     public void update(@RequestBody BpmRequest bpmRequest) {
-        // 添加流程xml定义
-        ProcessDef pmsModel = new ProcessDef();
-        pmsModel.setStatus(bpmRequest.getStatus());
-        pmsModel.setUpdateTime(new Date());
-        processDefMapper.update(pmsModel);
+
+        long id = bpmRequest.getId();
+        Long updateUid = bpmRequest.getUpdateUid();
+        updateUid = 3l;
+
+        ProcessDef def = processDefMapper.findById(id);
+
+        // 识别变量
+        List<VariableDto> variableDtoList = new ArrayList<>();
+        try {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            InputSource is = new InputSource(new StringReader(def.getProcessXml()));
+            Document doc = dBuilder.parse(is);
+
+            doc.getDocumentElement().normalize();
+
+            NodeList nList = doc.getElementsByTagName("userTask");
+
+            for (int temp = 0; temp < nList.getLength(); temp++) {
+                Node nNode = nList.item(temp);
+
+                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                    Element eElement = (Element) nNode;
+
+                    String assignee = eElement.getAttribute("activiti:assignee");
+                    // Remove the ${ and } to get the variable name
+                    if (assignee.startsWith("${")) {
+                        String variableName = assignee.replace("${", "").replace("}", "");
+
+                        VariableDto variableDto = new VariableDto();
+                        variableDto.setTaskId(eElement.getAttribute("id"));
+                        variableDto.setVariable(variableName);
+
+                        variableDtoList.add(variableDto);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // 更新流程xml定义
+        def.setProcessXml(bpmRequest.getProcessXml());
+        def.setUpdateUid(updateUid);
+        def.setUpdateTime(new Date());
+        if (!variableDtoList.isEmpty()) {
+            def.setVariables(gson.toJson(variableDtoList));
+        }
+
+        processDefMapper.update(def);
     }
 
     @PostMapping("/deployXml")
@@ -91,32 +180,67 @@ public class ProcessController {
         Deployment deploy = deploymentBuilder.deploy();
 
         String deploymentId = deploy.getId();
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-                .deploymentId(deploymentId)
-                .singleResult();
-
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId).singleResult();
         String processDefinitionId = processDefinition.getId();
         String processDefinitionKey = processDefinition.getKey();
+
+        log.info("部署={}, processDefinitionId={},processDefinitionKey={}  ", deploy, processDefinitionId, processDefinitionKey);
 
         processDef.setStatus(1);
         processDef.setUpdateTime(new Date());
 
-        processDef.setUpdateUid(bpmRequest.getUpdateUid());
+        processDef.setUpdateUid(1l);
         processDef.setProcessDefinitionKey(processDefinitionKey);
+        processDef.setProcessDefinitionId(processDefinitionId);
+        processDef.setPublishProcessXml(xmlStr);
+
+        if (StringUtils.isNotEmpty(processDef.getVariables())) {
+            processDef.setPublishVariables(processDef.getVariables());
+        }
+
         processDefMapper.update(processDef);
-        log.info("部署={}, processDefinitionId={},processDefinitionKey={}  ", deploy, processDefinitionId, processDefinitionKey);
     }
 
-    // 创建审批实例
-    @PostMapping("/startProcess")
-    public Object startProcess(@RequestParam String processDefinitionKey, @RequestParam String businessKey, @RequestBody Map<String, Object> variables) {
-        ExecutionEntityImpl start = (ExecutionEntityImpl) runtimeService.createProcessInstanceBuilder().processDefinitionKey(processDefinitionKey).variables(variables).businessKey(businessKey).start();
-        log.info("new getBusinessKey:{}", start.getBusinessKey());
-        log.info("new getProcessDefinitionId:{}", start.getProcessDefinitionId());
-        log.info("new getProcessInstanceId:{}", start.getProcessInstanceId());
-        log.info("new id:{}", start.getId());
-        log.info("new getDeploymentId:{}", start.getDeploymentId());
-        return start;
+    @GetMapping("/test/{id}")
+    public void test(@PathVariable long id) {
+        ProcessDef def = processDefMapper.findById(id);
+
+        List<VariableDto> variableDtoList = new ArrayList<>();
+        try {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            InputSource is = new InputSource(new StringReader(def.getProcessXml()));
+            Document doc = dBuilder.parse(is);
+
+            doc.getDocumentElement().normalize();
+
+            NodeList nList = doc.getElementsByTagName("userTask");
+
+            for (int temp = 0; temp < nList.getLength(); temp++) {
+                Node nNode = nList.item(temp);
+
+                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                    Element eElement = (Element) nNode;
+
+                    String assignee = eElement.getAttribute("activiti:assignee");
+                    // Remove the ${ and } to get the variable name
+                    if (assignee.startsWith("${")) {
+                        String variableName = assignee.replace("${", "").replace("}", "");
+
+                        VariableDto variableDto = new VariableDto();
+                        variableDto.setTaskId(eElement.getAttribute("id"));
+                        variableDto.setVariable(variableName);
+
+                        variableDtoList.add(variableDto);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        System.out.println(gson.toJson(variableDtoList));
     }
 }
 

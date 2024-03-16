@@ -16,6 +16,8 @@ public class Department {
 
     String name;
 
+    Long leaderId;
+
 
     Date createTime;
 

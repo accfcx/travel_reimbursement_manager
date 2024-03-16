@@ -7,6 +7,7 @@ import com.test.recipe.model.Person;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Date;
 
 /**
  * @author accfcx
@@ -17,20 +18,18 @@ public class SettingController {
     @Resource
     BankCardMapper bankCardMapper;
 
-    @Resource
-    PersonMapper personMapper;
 
     // 银行卡列表
-    @PostMapping("/bankCard/List?username={username}")
-    public Object bankCardList(@PathVariable String username) {
-
-        Person person = personMapper.findByName(username);
-        return bankCardMapper.findByOwnerId(person.getId());
+    @GetMapping("/bankCard/List/{uid}")
+    public Object bankCardList(@PathVariable Long uid) {
+        return bankCardMapper.findByOwnerId(uid);
     }
 
     // 新增
     @PostMapping("/bankCard/add")
     public Object bankCardAdd(@RequestBody BankCard bankCard) {
+        bankCard.setCreateTime(new Date());
+        bankCard.setUpdateTime(new Date());
         bankCardMapper.insert(bankCard);
         return "suc";
     }

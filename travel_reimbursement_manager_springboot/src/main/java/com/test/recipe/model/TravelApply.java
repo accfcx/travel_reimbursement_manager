@@ -6,9 +6,14 @@ import java.util.Date;
 
 @Data
 public class TravelApply {
-    private Long id;
-    private Long recipeId;
-    private Date startDate;
-    private Date endDate;
-    private String purpose;
+    Long id;
+    Long recipeId;
+    String applyType;
+    String travelTarget;
+    Date startDate;
+    Date endDate;
+
+    Date createTime;
+
+    Date updateTime;
 }

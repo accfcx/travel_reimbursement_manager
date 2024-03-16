@@ -8,6 +8,7 @@ import java.util.List;
 @Mapper
 public interface TravelReimbursementMapper {
     TravelReimbursement selectTravelReimbursement(Long id);
+    TravelReimbursement findByRecipeId(Long id);
     List<TravelReimbursement> selectAllTravelReimbursements();
     int insertTravelReimbursement(TravelReimbursement travelReimbursement);
     int updateTravelReimbursement(TravelReimbursement travelReimbursement);
