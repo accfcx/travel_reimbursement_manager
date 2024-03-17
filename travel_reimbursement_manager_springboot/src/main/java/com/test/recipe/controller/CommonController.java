@@ -4,8 +4,10 @@ import com.test.recipe.common.ResponseResult;
 import com.test.recipe.dto.PersonDto;
 import com.test.recipe.enums.*;
 import com.test.recipe.mapper.DepartmentMapper;
+import com.test.recipe.mapper.PermissionMapper;
 import com.test.recipe.mapper.PersonMapper;
 import com.test.recipe.model.Department;
+import com.test.recipe.model.Permission;
 import com.test.recipe.model.Person;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +26,9 @@ public class CommonController {
 
     @Resource
     DepartmentMapper departmentMapper;
+
+    @Resource
+    PermissionMapper permissionMapper;
 
     @GetMapping("/dict")
     public Map<String, Object> dict() {
@@ -89,8 +94,7 @@ public class CommonController {
 
 
     @PostMapping("/login")
-    public ResponseResult<PersonDto> login(@RequestBody PersonDto request) {
-        Person person = request.getPerson();
+    public ResponseResult<PersonDto> login(@RequestBody Person person) {
 
         if (person == null || person.getId() == null) {
             return new ResponseResult<>(100, "参数检验失败");
@@ -99,11 +103,14 @@ public class CommonController {
         PersonDto result = new PersonDto();
 
         Person resultPerson = personMapper.findById(person.getId());
+
         if (resultPerson.getPassword().equals(person.getPassword())) {
             Department department = departmentMapper.findById(resultPerson.getDepartmentId());
+            Permission permission = permissionMapper.findByUid(person.getId());
 
             result.setPerson(resultPerson);
             result.setDepartment(department);
+            result.setPermission(permission);
 
             return new ResponseResult<>(0, "suc", result);
         }
