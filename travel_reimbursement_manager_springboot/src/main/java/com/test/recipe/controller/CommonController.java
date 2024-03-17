@@ -49,12 +49,14 @@ public class CommonController {
 
 
         // 费用项类型
-        Map<String, Object> feeMap = new HashMap<>();
+        List<Map<String, Object>> feeMapList = new ArrayList<>();
         for (FeeType value : FeeType.values()) {
+            Map<String, Object> feeMap = new HashMap<>();
             feeMap.put("code", value.getCode());
             feeMap.put("desc", value.getDesc());
+            feeMapList.add(feeMap);
         }
-        dict.put("feeType", feeMap);
+        dict.put("feeType", feeMapList);
 
 
         // 单据状态
