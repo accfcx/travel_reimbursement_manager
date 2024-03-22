@@ -5,9 +5,10 @@
 
 <mapper namespace="com.test.recipe.mapper.FeeItemMapper">
     <insert id="insert" parameterType="com.test.recipe.model.FeeItem">
-        INSERT INTO fee_item (recipe_id, fee_type, start_date, end_date, amount, start_city, end_city, purpose,
-                              people_count)
+        INSERT INTO fee_item ( recipe_id, fee_type, start_date, end_date, amount, start_city, end_city, purpose, month
+                             , people_count)
         VALUES (#{recipeId}, #{feeType}, #{startDate}, #{endDate}, #{amount}, #{startCity}, #{endCity}, #{purpose},
+                #{month},
                 #{peopleCount})
     </insert>
 
@@ -47,6 +48,9 @@
             <if test="updateTime != null">
                 update_time= #{updateTime}
             </if>
+            <if test="month != null">
+                month= #{month}
+            </if>
         </set>
         WHERE id = #{id}
     </update>
@@ -75,11 +79,12 @@
     </select>
 
     <select id="aggByMonth" resultType="map">
-        SELECT MONTH(CURDATE()) as month, SUM(amount) as total_amount
+        SELECT MONTH(start_date) as month, SUM(amount) as total_amount
         FROM fee_item
         WHERE YEAR(start_date) = YEAR(CURDATE())
         GROUP BY MONTH(start_date)
     </select>
+
 
 
     <select id="aggByFeeType" resultType="map">

@@ -113,7 +113,12 @@ public class RecipeController {
         Long uid = request.getUid();
         Recipe query = new Recipe();
         query.setUid(uid);
-        return recipeMapper.selectAllRecipes(query);
+        List<Recipe> recipes = recipeMapper.selectAllRecipes(query);
+        recipes.forEach(item -> {
+            item.setDepartmentName(departmentMapper.findById(item.getDepartmentId()).getName());
+        });
+
+        return recipes;
     }
 
     @PostMapping("/listAll")
@@ -461,6 +466,8 @@ public class RecipeController {
                 } else if (variableDto.getVariable().equals("leader")) {
                     Department department = departmentMapper.findById(submitter.getDepartmentId());
                     Person leader = personMapper.findById(department.getLeaderId());
+
+                    // 如果单据提交人 和所在部门的leader 是同一人
                     variables.put("leader", leader.getUsername());
                 }
             });

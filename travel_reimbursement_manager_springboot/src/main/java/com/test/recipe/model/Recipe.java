@@ -25,4 +25,5 @@ public class Recipe {
     Date createTimeStart;
     Date createTimeEnd;
     List<String> recipeTypeList;
+    String departmentName;
 }

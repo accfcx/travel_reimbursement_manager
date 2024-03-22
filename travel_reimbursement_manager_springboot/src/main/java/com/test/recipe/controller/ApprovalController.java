@@ -127,6 +127,7 @@ public class ApprovalController {
         // 为每个任务获取结束时间和处理时长
         return tasks.stream().map(task -> {
             String taskId = task.getId();
+            System.out.println(taskId);
             Date endTime = task.getEndTime();
             long duration = task.getDurationInMillis();
             String processInstanceId = task.getProcessInstanceId();
@@ -154,7 +155,6 @@ public class ApprovalController {
             if (Objects.nonNull(feeItem)) {
                 feeType = feeItem.getFeeType();
             }
-
 
             return new TaskInfo(id, processInstanceId, taskId, recipe.getNo(), type, feeTotal, reason, username, duration, endTime, feeType);
         }).collect(Collectors.toList());

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,9 +35,6 @@ public class AnalyzeController {
         List<Map<String, Object>> aggMonth = feeItemMapper.aggByMonth();
         List<Map<String, Object>> aggType = feeItemMapper.aggByFeeType();
 
-        Gson gson = new Gson();
-        System.out.println(gson.toJson(aggStatus));
-
         List<Map<String, Object>> aggStatusV2 = new ArrayList<>();
         aggStatus.forEach(item -> {
             if (String.valueOf(item.get("recipe_status")).equals(RecipeStatus.FINISHED.getCode()) || String.valueOf(item.get("recipe_status")).equals(RecipeStatus.REJECTED.getCode())) {
@@ -45,9 +43,30 @@ public class AnalyzeController {
             }
         });
 
+        List<Map<String, Object>> aggMonthMapList = new ArrayList<>();
+        for (int i = 1; i <= 12; i++) {
+            Map<String, Object> defaultEntry = new HashMap<>();
+            defaultEntry.put("month", i);
+            defaultEntry.put("total_amount", BigDecimal.ZERO);
+            aggMonthMapList.add(defaultEntry);
+        }
+
+        aggMonth.forEach(item -> {
+            int month = (int) item.get("month");
+            BigDecimal amount = (BigDecimal) item.get("total_amount");
+            for (Map<String, Object> entry : aggMonthMapList) {
+                if ((int) entry.get("month") == month) {
+                    entry.put("total_amount", amount);
+                    break;
+                }
+            }
+        });
+
         result.put("aggStatus", aggStatusV2);
-        result.put("aggMonth", aggMonth);
+        result.put("aggMonth", aggMonthMapList);
         result.put("aggType", aggType);
+
+
 
         return result;
     }

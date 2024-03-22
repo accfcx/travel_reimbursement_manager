@@ -10,6 +10,7 @@ spring:
     username: root
     driver-class-name: com.mysql.cj.jdbc.Driver
     password:
+#    password: dfasufoufdji13148209jklda!@@#
   servlet:
     multipart: #设置上传文件大小
       enabled: true
